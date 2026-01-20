@@ -9,7 +9,6 @@ from langchain_groq import ChatGroq
 from langchain_core.messages import HumanMessage
 import streamlit as st
 
-
 # =====================================================
 # FONT SIZES
 # =====================================================
@@ -18,9 +17,8 @@ HEADING_FONT_SIZE = Pt(13)
 BODY_FONT_SIZE = Pt(11)
 
 # =====================================================
-# ==========================================
-# LOAD GROQ API KEY (STREAMLIT CLOUD SAFE)
-# ==========================================
+# LOAD GROQ API KEY
+# =====================================================
 try:
     GROQ_API_KEY = st.secrets["GROQ_API_KEY"]
 except KeyError:
@@ -31,6 +29,16 @@ llm = ChatGroq(
     temperature=0,
     api_key=GROQ_API_KEY
 )
+
+# =====================================================
+# TITLE CASE HELPER
+# =====================================================
+def to_title_case(title: str) -> str:
+    if not title:
+        return title
+    words = title.split()
+    return " ".join(w.upper() if w.lower() == "ai" else w.capitalize() for w in words)
+
 # =====================================================
 # JD HEADINGS
 # =====================================================
@@ -103,9 +111,8 @@ def build_header_block(row):
 
     return " | ".join([p for p in parts if p])
 
-
 # =====================================================
-# 🔹 NEW: CLARIFICATION SANITIZER (KEY CHANGE)
+# CLARIFICATION SANITIZER
 # =====================================================
 def sanitize_clarifications(clarifications):
     """
@@ -114,17 +121,15 @@ def sanitize_clarifications(clarifications):
     that clarification is REMOVED so it does NOT affect the JD.
     """
     sanitized = {}
-
     for question, answer in clarifications.items():
         if isinstance(answer, str):
             if answer.strip().lower() in ["not applicable", "none of the above"]:
-                continue  # 🚫 do not pass to LLM
+                continue
             sanitized[question] = answer
-
     return sanitized
 
 # =====================================================
-# CORE JD GENERATION (WITH CLARIFICATIONS)
+# CORE JD GENERATION
 # =====================================================
 def generate_ranked_jd(row, clarifications=None):
     """
@@ -134,40 +139,39 @@ def generate_ranked_jd(row, clarifications=None):
     - Requirements
     - Skills
     - Seniority
-
+ 
     If clarification == 'Not Applicable', it is ignored.
     """
 
     clarifications = clarifications or {}
     clarifications = sanitize_clarifications(clarifications)
 
-    # 🔹 Resolve final Job Title
+    # 🔹 Detect Job Title column dynamically
     job_title_col = None
     for k in row.index:
         if "job" in k.lower() and "title" in k.lower():
-        job_title_col = k
-        break
-    
+            job_title_col = k
+            break
+
     job_title = row.get(job_title_col, "")
 
-# Override if clarified
+    # 🔹 Override if clarified
     for q, a in clarifications.items():
         if "job title" in q.lower():
             job_title = a
             break
-            
+
     job_title = to_title_case(job_title)
 
-    
     clarification_block = ""
     if clarifications:
         clarification_block = """
 IMPORTANT – MANDATORY OVERRIDE RULES:
-
+ 
 You MUST strictly incorporate ALL clarifications below.
 These clarifications OVERRIDE assumptions from input data.
 They MUST directly affect responsibilities, scope, skills, and expectations.
-
+ 
 HIRING MANAGER CLARIFICATIONS:
 """
         for q, a in clarifications.items():
@@ -177,90 +181,89 @@ HIRING MANAGER CLARIFICATIONS:
 {clarification_block}
 
 STRICT FORMATTING RULES:
-
+ 
 Role Title section:
 - Output ONLY: "Role Title" heading followed by the job title.
 - DO NOT include location, travel, or meta info.
-
+ 
 Skills sections:
 - Must-Have Skills and Preferred Skills MUST be bullet points starting with •
 - Each bullet = Skill name + VERY brief explanation (1 line)
-
+ 
 If a clarification is not provided, DO NOT infer or assume details for it.
-
+ 
 =====================
 REQUIRED STRUCTURE
 =====================
-
+ 
 Role Title
 <Job Title Only>
-
+ 
 Role Overview
 <1 clear paragraph explaining the role's purpose and impact.>
-
+ 
 What You'll Do?
 <2–3 line intro paragraph describing overall responsibilities.>
-
+ 
 Responsibilities
 • Write 5–6 responsibilities
 • Each responsibility 1–2 lines
 • Reflect clarifications explicitly
-
+ 
 Requirements
 • 4–5 requirements
 • Education, experience, seniority must reflect clarifications
-
+ 
 Who'll Succeed in this Role?
 <1 paragraph describing mindset, ownership, pace, attitude>
-
+ 
 Must-Have Skills
 • Skill – brief explanation
 • Skill – brief explanation
 • Skill – brief explanation
 • Skill – brief explanation
 • Skill – brief explanation
-
+ 
 Preferred Skills
 • Skill – brief explanation
 • Skill – brief explanation
 • Skill – brief explanation
 • Skill – brief explanation
 • Skill – brief explanation
-
+ 
 About WOGOM
 <2–3 lines about company mission and culture>
-
+ 
 =====================
 INPUT DATA
 =====================
-
+ 
 Job Title: {row.get('Job Title','')}
-
+ 
 Reporting To: {row.get('Reporting To','')}
-
+ 
 Role Overview:
 {row.get('Role Overview','')}
-
+ 
 Education: {row.get('Minimum education required','')}
 Experience: {row.get('Minimum experience required','')}
 Core Responsibility: {row.get('What is the single core responsibility of this role?','')}
-
+ 
 Key Responsibilities:
 {row.get('Key Responsibilities','')}
-
+ 
 Top Skills:
 {row.get('Top 3 skills this role MUST have','')}
-
+ 
 Other Skills:
 {row.get('other skills','')}
-
+ 
 Growth Opportunities:
 {row.get('Growth opportunities in this role','')}
-
+ 
 Company Context:
 {row.get('Role Context','')}
 """
-
     response = llm.invoke([HumanMessage(content=prompt)])
     return response.content.strip()
 
@@ -276,7 +279,6 @@ def write_jd_to_docx(jd_text, row):
         "Must-Have Skills",
         "Preferred Skills",
     }
-
     # Job title
     add_job_title(doc, row["__job_title__"])
 
@@ -317,7 +319,3 @@ def write_jd_to_docx(jd_text, row):
         i += 1
 
     return doc
-
-
-
-
