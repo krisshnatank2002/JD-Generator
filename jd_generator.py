@@ -7,6 +7,8 @@ from docx.shared import Pt
 from docx.oxml.ns import qn
 from langchain_groq import ChatGroq
 from langchain_core.messages import HumanMessage
+import streamlit as st
+
 
 # =====================================================
 # FONT SIZES
@@ -293,4 +295,5 @@ def write_jd_to_docx(jd_text, row):
         i += 1
 
     return doc
+
 
