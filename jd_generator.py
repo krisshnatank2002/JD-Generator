@@ -141,6 +141,24 @@ def generate_ranked_jd(row, clarifications=None):
     clarifications = clarifications or {}
     clarifications = sanitize_clarifications(clarifications)
 
+    # 🔹 Resolve final Job Title
+    job_title_col = None
+    for k in row.index:
+        if "job" in k.lower() and "title" in k.lower():
+        job_title_col = k
+        break
+    
+    job_title = row.get(job_title_col, "")
+
+# Override if clarified
+    for q, a in clarifications.items():
+        if "job title" in q.lower():
+            job_title = a
+            break
+            
+    job_title = to_title_case(job_title)
+
+    
     clarification_block = ""
     if clarifications:
         clarification_block = """
@@ -299,6 +317,7 @@ def write_jd_to_docx(jd_text, row):
         i += 1
 
     return doc
+
 
 
 
