@@ -16,20 +16,19 @@ HEADING_FONT_SIZE = Pt(13)
 BODY_FONT_SIZE = Pt(11)
 
 # =====================================================
-# LOAD LLM
-# =====================================================
-# Load API key from system
-GROQ_API_KEY = os.getenv("GROQ_API_KEY")
-
-if not GROQ_API_KEY:
-    raise RuntimeError("GROQ_API_KEY not found. Set it first.")
+# ==========================================
+# LOAD GROQ API KEY (STREAMLIT CLOUD SAFE)
+# ==========================================
+try:
+    GROQ_API_KEY = st.secrets["GROQ_API_KEY"]
+except KeyError:
+    raise RuntimeError("GROQ_API_KEY not found in Streamlit Secrets")
 
 llm = ChatGroq(
     model="llama-3.3-70b-versatile",
     temperature=0,
     api_key=GROQ_API_KEY
 )
-
 # =====================================================
 # JD HEADINGS
 # =====================================================
@@ -294,3 +293,4 @@ def write_jd_to_docx(jd_text, row):
         i += 1
 
     return doc
+
