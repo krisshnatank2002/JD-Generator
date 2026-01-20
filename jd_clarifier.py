@@ -58,19 +58,33 @@ def generate_role_specific_clarifying_questions(
     prompt = f"""
 You are a senior HR consultant.
 
-Job Title: {job_title}
+CRITICAL ROLE CONTEXT:
+This role is strictly: "{job_title}"
+
+IMPORTANT RULES:
+- ALL questions MUST be relevant ONLY to this role
+- DO NOT ask questions related to software engineering, coding, cloud, DevOps, AWS, architecture, or technical stack
+- If the role is Sales, focus ONLY on:
+  - Targets
+  - Revenue
+  - Client acquisition
+  - CRM
+  - Sales cycle
+  - Territory
+  - Incentives
+- If the role is non-technical, DO NOT include technical terminology
 
 Draft Job Description:
 {jd_text}
 
 Your task:
-Generate 7-8 HIGHLY PRACTICAL clarification questions
-that a hiring manager would answer to refine this role.
+Generate 6–8 HIGHLY PRACTICAL clarification questions
+that a hiring manager would answer to refine THIS ROLE.
 
 Rules:
 - Questions must be multiple-choice
 - Each question should have 3–4 realistic options
-
+- Questions must MATCH the job title exactly
 - Output STRICTLY in this JSON-like format:
 
 [
@@ -80,8 +94,10 @@ Rules:
   }}
 ]
 
-DO NOT add any explanations or extra text.
+DO NOT add explanations.
+DO NOT mention any other job roles.
 """
+
 
     response = llm.invoke([HumanMessage(content=prompt)])
     text = response.content.strip()
@@ -94,4 +110,5 @@ DO NOT add any explanations or extra text.
         pass
 
     return questions
+
 
