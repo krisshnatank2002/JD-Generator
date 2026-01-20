@@ -60,11 +60,11 @@
 
 #     return df
 
-import json
 import streamlit as st
-from google.oauth2.service_account import Credentials
 import gspread
 import pandas as pd
+from google.oauth2.service_account import Credentials
+
 
 def load_form_data():
     scopes = [
@@ -72,12 +72,9 @@ def load_form_data():
         "https://www.googleapis.com/auth/drive.readonly",
     ]
 
-    service_account_info = json.loads(
-        st.secrets["GOOGLE_SERVICE_ACCOUNT_JSON"]
-    )
-
+    # ✅ DIRECTLY USE TOML TABLE (NO JSON PARSING)
     creds = Credentials.from_service_account_info(
-        service_account_info,
+        dict(st.secrets["google_service_account"]),
         scopes=scopes
     )
 
@@ -88,3 +85,5 @@ def load_form_data():
 
     data = sheet.get_all_records()
     return pd.DataFrame(data)
+
+
