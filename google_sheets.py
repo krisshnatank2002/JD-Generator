@@ -60,11 +60,11 @@
 
 #     return df
 
-import streamlit as st
+
 import gspread
 import pandas as pd
 from google.oauth2.service_account import Credentials
-
+import streamlit as st
 
 def load_form_data():
     scopes = [
@@ -72,19 +72,18 @@ def load_form_data():
         "https://www.googleapis.com/auth/drive.readonly",
     ]
 
-    # ✅ DIRECTLY USE TOML TABLE (NO JSON PARSING)
     creds = Credentials.from_service_account_info(
-        dict(st.secrets["google_service_account"]),
+        st.secrets["google_service_account"],
         scopes=scopes
     )
 
     client = gspread.authorize(creds)
 
     SPREADSHEET_ID = "1SpNGsY707CaY6i06knI9F2HJdtAcHxGKq8IjAb17oWo"
-    # SPREADSHEET_ID = "1SpNGsY707CaY6i06knI9F2HJdtAcHxGKq8IjAb17oW0"
-    sheet = client.open_by_key(SPREADSHEET_ID).sheet1
 
+    sheet = client.open_by_key(SPREADSHEET_ID).sheet1
     data = sheet.get_all_records()
+
     return pd.DataFrame(data)
 
 
