@@ -2,12 +2,18 @@ from langchain_core.messages import HumanMessage
 import json
 
 
-def generate_role_specific_clarifying_questions(llm, row):
+def generate_role_specific_clarifying_questions(llm, row, draft_jd: str = ""):
     """
-    Generates high-quality clarifying questions for JD creation.
-    - First question: job title refinement
-    - Remaining questions: derived ONLY from JD gaps discovered
-      while attempting to draft the JD.
+    Generates high-quality clarifying questions for JD creation
+    by analyzing BOTH:
+    - Excel intake data
+    - Draft Job Description (if provided)
+
+    Questions are asked ONLY where:
+    - Information is missing
+    - Assumptions are made
+    - Excel and JD conflict
+    - JD could be misleading
     """
 
     # ----------------------------
@@ -20,7 +26,7 @@ def generate_role_specific_clarifying_questions(llm, row):
             break
 
     # ----------------------------
-    # Raw form context (no interpretation)
+    # Raw form context (Excel)
     # ----------------------------
     form_context = "\n".join(
         f"{k}: {row[k]}" for k in row.index if str(row[k]).strip()
@@ -63,29 +69,32 @@ Rules:
         })
 
     # =====================================================
-    # 2️⃣ JD GAP–DRIVEN CLARIFYING QUESTIONS (ENHANCED)
+    # 2️⃣ EXCEL + DRAFT JD GAP ANALYSIS (KEY CHANGE)
     # =====================================================
     dynamic_prompt = f"""
 You are a senior HR professional.
 
-Your task is NOT to guess the role.
-Your task is to produce a clear, accurate,
-and non-misleading Job Description.
+Your goal is to ensure the final Job Description
+is accurate, complete, and non-misleading.
 
-JOB TITLE:
-{job_title}
+You are given TWO sources of truth:
 
-RAW FORM DATA:
+SOURCE 1: EXCEL / INTAKE DATA
 {form_context}
 
+SOURCE 2: DRAFT JOB DESCRIPTION
+{draft_jd if draft_jd.strip() else "No draft JD provided yet."}
+
 TASK:
-First, internally attempt to draft a Job Description
-using ONLY the information provided.
+Analyze BOTH sources together.
 
-While drafting, identify where assumptions would be required,
-where clarity is missing, or where the JD could become misleading.
+While reviewing, identify:
+- Information present in Excel but missing in the JD
+- Information stated in the JD but not supported by Excel
+- Areas where the JD makes assumptions
+- Sections where clarity is insufficient or misleading
 
-Ask clarifying questions ONLY for those points.
+Ask clarifying questions ONLY for those issues.
 
 JD SECTIONS TO CONSIDER:
 - Core responsibilities
@@ -97,21 +106,21 @@ JD SECTIONS TO CONSIDER:
 - Tools or systems used
 - Reporting & collaboration
 
-MANDATORY RULES:
-- Do NOT assume technical, repair, inventory, product, or execution duties
-  unless explicitly stated in the form data
-- Do NOT narrow or expand the role incorrectly
-- Do NOT repeat information already provided
-- If answering a question only changes wording, do NOT ask it
-- Ensure at least ONE question clarifies role boundaries (out-of-scope work)
+STRICT RULES:
+- Do NOT invent responsibilities
+- Do NOT assume technical, repair, inventory, or product duties
+  unless explicitly stated in either source
+- Do NOT repeat clearly aligned information
+- If a question only improves wording, do NOT ask it
+- Ensure at least ONE question clarifies role boundaries
 - Cover at least 5 different JD sections
 - Ask no more than ONE question per JD section
 
 QUESTION RULES:
 - 6–8 questions maximum
-- Each question must be multiple-choice (3–4 realistic options)
-- Neutral, non-assumptive wording
-- Each question must materially affect JD content
+- Multiple-choice only (3–4 realistic options)
+- Neutral wording (no seniority or skill assumptions)
+- Each question must materially change JD accuracy
 
 OUTPUT:
 Return ONLY valid JSON.
@@ -134,7 +143,7 @@ FORMAT:
         parsed = []
 
     # =====================================================
-    # 3️⃣ QUALITY FILTER (HARD GUARD)
+    # 3️⃣ QUALITY FILTER (UNCHANGED, STILL IMPORTANT)
     # =====================================================
     banned_keywords = [
         "repair", "spare", "inventory", "fix rate",
