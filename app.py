@@ -130,11 +130,10 @@ if "data" in st.session_state:
                 key=f"clarify_{idx}"
             )
 
-                # ================================
-        # STEP 3: FINAL JD
-        # ================================
-        if st.button("✨ Generate FINAL Job Description"):
-
+    # ================================
+    # STEP 3: FINAL JD
+    # ================================
+    if st.button("✨ Generate FINAL Job Description"):
             row = st.session_state["selected_row"].copy()
 
             # Safety net
@@ -165,6 +164,7 @@ if "data" in st.session_state:
 
 else:
     st.info("ℹ️ Load Google Form data first")
+
 
 
 
