@@ -16,6 +16,13 @@ st.set_page_config(
 )
 
 # ==========================================
+# ENV CHECK (FAIL FAST)
+# ==========================================
+if "GROQ_API_KEY" not in st.secrets:
+    st.error("❌ GROQ_API_KEY not found in Streamlit Secrets")
+    st.stop()
+
+# ==========================================
 # INIT LLM
 # ==========================================
 llm = ChatGroq(
@@ -247,3 +254,4 @@ if "data" in st.session_state:
 
 else:
     st.info("ℹ️ Load Google Form data first")
+
