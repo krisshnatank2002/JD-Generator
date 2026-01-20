@@ -64,13 +64,13 @@ Draft Job Description:
 {jd_text}
 
 Your task:
-Generate 4–6 HIGHLY PRACTICAL clarification questions
+Generate 7-8 HIGHLY PRACTICAL clarification questions
 that a hiring manager would answer to refine this role.
 
 Rules:
 - Questions must be multiple-choice
 - Each question should have 3–4 realistic options
-- Focus on scope, seniority, targets, tools, and expectations
+
 - Output STRICTLY in this JSON-like format:
 
 [
@@ -94,3 +94,4 @@ DO NOT add any explanations or extra text.
         pass
 
     return questions
+
