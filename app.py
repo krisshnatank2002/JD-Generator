@@ -58,6 +58,7 @@ if st.button("📥 Fetch Latest Google Form Responses"):
         st.write("Available columns:", list(df.columns))
         st.stop()
 
+    # Label only for dropdown
     df["JD_Label"] = df[job_title_col].fillna("Untitled Role")
 
     st.session_state["data"] = df
@@ -95,6 +96,8 @@ if "data" in st.session_state:
     if st.button("🚀 Generate Draft JD"):
 
         selected_row = df[df["JD_Label"] == selected_jd].iloc[0].copy()
+
+        # Persist original job title
         selected_row["__job_title__"] = selected_row[job_title_col]
 
         st.session_state["selected_row"] = selected_row
@@ -103,14 +106,14 @@ if "data" in st.session_state:
             st.session_state["draft_jd"] = generate_ranked_jd(selected_row)
 
         with st.spinner("Generating clarifying questions..."):
+            # ✅ FIXED: pass ROW only
             st.session_state["questions"] = generate_role_specific_clarifying_questions(
                 llm,
-                selected_row[job_title_col],
-                st.session_state["draft_jd"]
+                selected_row
             )
 
         st.session_state["answers"] = {}
-        st.success("✅ Draft JD & questions ready")
+        st.success("✅ Draft JD & clarifying questions ready")
 
     # ================================
     # STEP 2: SHOW QUESTIONS
