@@ -89,16 +89,20 @@ def add_bullet(doc, text):
 def build_header_block(row):
     parts = []
 
-    for key in ["Location", "Employment Type", "Work mode"]:
-        v = row.get(key, "").strip()
-        if v:
-            parts.append(v)
+    for key in row.index:
+        if "location" in key.lower():
+            parts.append(row[key])
+        if "employment" in key.lower():
+            parts.append(row[key])
+        if "work mode" in key.lower() or "workmode" in key.lower():
+            parts.append(row[key])
 
     travel = row.get("Does this role require travel?", "").strip()
     if travel:
         parts.append(f"{travel} travel")
 
-    return " | ".join(parts)
+    return " | ".join([p for p in parts if p])
+
 
 # =====================================================
 # 🔹 NEW: CLARIFICATION SANITIZER (KEY CHANGE)
@@ -256,7 +260,7 @@ def write_jd_to_docx(jd_text, row):
     }
 
     # Job title
-    add_job_title(doc, row.get("Job Title", ""))
+    add_job_title(doc, row["__job_title__"])
 
     # Meta line
     meta = build_header_block(row)
@@ -295,5 +299,6 @@ def write_jd_to_docx(jd_text, row):
         i += 1
 
     return doc
+
 
 
