@@ -4,10 +4,10 @@ import json
 
 def generate_role_specific_clarifying_questions(llm, row):
     """
-    FIRST question: fixed (job title refinement)
-    Remaining questions: generated ONLY to fill JD gaps
-    (scope, responsibilities, success criteria, environment).
-    No role guessing, no technical assumptions.
+    Generates high-quality clarifying questions for JD creation.
+    - First question: job title refinement
+    - Remaining questions: derived ONLY from JD gaps discovered
+      while attempting to draft the JD.
     """
 
     # ----------------------------
@@ -58,20 +58,19 @@ Rules:
     if title_options:
         title_options.append("None of the above (keep current title)")
         questions.append({
-            "question": "Select the most appropriate job title, if you wish to redefine the current title!",
+            "question": "Please select the most appropriate job title, if you would like to redefine it.",
             "options": title_options
         })
 
     # =====================================================
-    # 2️⃣ JD GAP–DRIVEN CLARIFYING QUESTIONS (CORE FIX)
+    # 2️⃣ JD GAP–DRIVEN CLARIFYING QUESTIONS (ENHANCED)
     # =====================================================
     dynamic_prompt = f"""
-You are an expert HR professional.
+You are a senior HR professional.
 
-Your ONLY goal is to write a clear, accurate,
+Your task is NOT to guess the role.
+Your task is to produce a clear, accurate,
 and non-misleading Job Description.
-
-You are given partial intake data.
 
 JOB TITLE:
 {job_title}
@@ -80,35 +79,39 @@ RAW FORM DATA:
 {form_context}
 
 TASK:
-If you had to write the Job Description now,
-identify which JD sections would be weak, unclear,
-or misleading due to missing information.
+First, internally attempt to draft a Job Description
+using ONLY the information provided.
 
-For EACH such gap, ask ONE clarifying question.
+While drafting, identify where assumptions would be required,
+where clarity is missing, or where the JD could become misleading.
 
-JD SECTIONS YOU MAY CONSIDER:
+Ask clarifying questions ONLY for those points.
+
+JD SECTIONS TO CONSIDER:
 - Core responsibilities
 - Day-to-day activities
-- Scope boundaries (what the role does NOT do)
+- Scope boundaries (what the role does NOT include)
 - Success metrics / performance expectations
 - Work environment (office / field / hybrid)
 - Travel or shift expectations
 - Tools or systems used
-- Collaboration & reporting
+- Reporting & collaboration
 
-STRICT RULES:
-- DO NOT assume technical, repair, inventory, or product responsibilities
-  unless they are explicitly mentioned in the form data
-- DO NOT expand the role beyond the provided information
-- DO NOT ask questions that narrow the role incorrectly
-- DO NOT repeat information already present
-- Ask ONLY questions that materially improve the JD
+MANDATORY RULES:
+- Do NOT assume technical, repair, inventory, product, or execution duties
+  unless explicitly stated in the form data
+- Do NOT narrow or expand the role incorrectly
+- Do NOT repeat information already provided
+- If answering a question only changes wording, do NOT ask it
+- Ensure at least ONE question clarifies role boundaries (out-of-scope work)
+- Cover at least 5 different JD sections
+- Ask no more than ONE question per JD section
 
 QUESTION RULES:
 - 6–8 questions maximum
 - Each question must be multiple-choice (3–4 realistic options)
-- Neutral wording (no implied seniority or skill level)
-- Each question must affect JD content meaningfully
+- Neutral, non-assumptive wording
+- Each question must materially affect JD content
 
 OUTPUT:
 Return ONLY valid JSON.
@@ -130,6 +133,18 @@ FORMAT:
     except Exception:
         parsed = []
 
+    # =====================================================
+    # 3️⃣ QUALITY FILTER (HARD GUARD)
+    # =====================================================
+    banned_keywords = [
+        "repair", "spare", "inventory", "fix rate",
+        "certification", "expert level", "years of experience"
+    ]
+
+    def is_high_quality_question(q):
+        text = q["question"].lower()
+        return not any(b in text for b in banned_keywords)
+
     if isinstance(parsed, list):
         for q in parsed:
             if (
@@ -137,8 +152,8 @@ FORMAT:
                 and isinstance(q.get("question"), str)
                 and isinstance(q.get("options"), list)
                 and 3 <= len(q["options"]) <= 4
+                and is_high_quality_question(q)
             ):
                 questions.append(q)
 
     return questions
-
