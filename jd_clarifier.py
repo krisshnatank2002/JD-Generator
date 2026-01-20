@@ -96,6 +96,15 @@ While reviewing, identify:
 
 Ask clarifying questions ONLY for those issues.
 
+JD SECTIONS TO CONSIDER:
+- Core responsibilities
+- Day-to-day activities
+- Scope boundaries (what the role does NOT include)
+- Success metrics / performance expectations
+- Work environment (office / field / hybrid)
+- Travel or shift expectations
+- Tools or systems used
+- Reporting & collaboration
 
 STRICT RULES:
 - Do NOT invent responsibilities
@@ -157,4 +166,5 @@ FORMAT:
                 questions.append(q)
 
     return questions
+
 
