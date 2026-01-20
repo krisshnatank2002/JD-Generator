@@ -34,6 +34,13 @@ def generate_role_specific_clarifying_questions(
     job_title: str,
     jd_text: str
 ):
+questions = []
+
+# 🔹 Job title clarification FIRST
+title_q = generate_job_title_clarification(llm, job_title)
+if title_q:
+    questions.append(title_q)
+
     """
     Uses LLM to generate role-specific clarifying questions
     Returns structured questions with MCQ options
@@ -76,4 +83,5 @@ DO NOT add any explanations or extra text.
         return questions if isinstance(questions, list) else []
     except Exception:
         return []
+
 
