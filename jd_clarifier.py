@@ -4,12 +4,13 @@ import json
 
 def generate_role_specific_clarifying_questions(llm, row):
     """
-    Generate clarifying questions based on Google Form / Excel data,
-    NOT on draft JD.
+    FIRST question: fixed (job title refinement)
+    Remaining questions: completely LLM-decided, role-specific,
+    based ONLY on what improves the JD and what is missing.
     """
 
     # ----------------------------
-    # Resolve Job Title safely
+    # Resolve Job Title
     # ----------------------------
     job_title = "This role"
     for k in row.index:
@@ -17,70 +18,95 @@ def generate_role_specific_clarifying_questions(llm, row):
             job_title = str(row[k]).strip()
             break
 
-    core_responsibility = row.get(
-        "What is the single core responsibility of this role?", ""
+    # Pass ALL form data as raw context (no interpretation)
+    form_context = "\n".join(
+        f"{k}: {row[k]}" for k in row.index if str(row[k]).strip()
     )
 
-    experience = row.get("Minimum experience required", "")
-    education = row.get("Minimum education required", "")
-    work_mode = row.get("Work mode", "")
-    travel = row.get("Does this role require travel?", "")
-    urgency = row.get("How urgent is this hire?", "")
+    questions = []
 
-    prompt = f"""
-You are an HR consultant.
+    # =====================================================
+    # 1️⃣ FIXED FIRST QUESTION — JOB TITLE REFINEMENT
+    # =====================================================
+    title_prompt = f"""
+You are an HR expert.
 
-ROLE CONTEXT (FROM FORM DATA):
-Job Title: {job_title}
-Core Responsibility: {core_responsibility}
-Experience Required: {experience}
-Education Required: {education}
-Work Mode: {work_mode}
-Travel Requirement: {travel}
-Hiring Urgency: {urgency}
+Current job title:
+"{job_title}"
+
+Generate 5–6 professional alternative job titles
+that are suitable for hiring and job postings.
+
+Rules:
+- Keep the same role meaning
+- Improve clarity and professionalism
+- Use Title Case
+- Output ONLY valid JSON array of strings
+"""
+
+    title_response = llm.invoke([HumanMessage(content=title_prompt)])
+
+    try:
+        title_options = json.loads(title_response.content.strip())
+        title_options = [str(t) for t in title_options][:6]
+    except Exception:
+        title_options = []
+
+    if title_options:
+        title_options.append("None of the above (keep current title)")
+        questions.append({
+            "question": "Is this the most suitable and professional job title for this role?",
+            "options": title_options
+        })
+
+    # =====================================================
+    # 2️⃣ FULLY DYNAMIC JD-ENHANCING QUESTIONS (NO TEMPLATE)
+    # =====================================================
+    dynamic_prompt = f"""
+You are a senior hiring manager and HR expert.
+
+Below is RAW DATA collected from a hiring intake form.
+Some information may be incomplete, vague, or missing.
+
+JOB TITLE:
+{job_title}
+
+FORM DATA:
+{form_context}
 
 TASK:
-Generate 6–8 clarifying questions a hiring manager should answer
-to finalize this role.
+Decide on your own which clarifying questions MUST be asked
+to significantly improve the final Job Description for this role.
 
-RULES:
-- Questions must be strictly relevant to THIS job title
-- Do NOT assume a technical role unless the title clearly says so
-- Questions should refine:
-  - scope
-  - targets / KPIs
-  - seniority
-  - responsibilities
-  - expectations
-- Each question must be multiple-choice (3–4 options)
-- Output ONLY valid JSON in this exact format:
+IMPORTANT RULES:
+- DO NOT follow any fixed structure or template
+- DO NOT ask generic or repetitive questions
+- DO NOT ask questions already clearly answered in the data
+- Ask ONLY what is missing, unclear, or critical for this specific role
+- Questions must differ depending on the job role
+- Think like a hiring manager trying to avoid a weak or misleading JD
+- Each question must be multiple-choice (3–4 realistic options)
 
+OUTPUT REQUIREMENTS:
+- Generate 7–8 questions
+- Output ONLY valid JSON in the format below
+- Do NOT include explanations or extra text
+
+FORMAT:
 [
   {{
     "question": "string",
     "options": ["string", "string", "string"]
   }}
 ]
-
-DO NOT include explanations.
-DO NOT include any text outside JSON.
 """
 
-    response = llm.invoke([HumanMessage(content=prompt)])
-    raw = response.content.strip()
+    response = llm.invoke([HumanMessage(content=dynamic_prompt)])
 
-    # ----------------------------
-    # Safe JSON parsing
-    # ----------------------------
     try:
-        parsed = json.loads(raw)
+        parsed = json.loads(response.content.strip())
     except Exception:
-        return []
-
-    # ----------------------------
-    # Validate structure
-    # ----------------------------
-    valid_questions = []
+        parsed = []
 
     if isinstance(parsed, list):
         for q in parsed:
@@ -90,6 +116,6 @@ DO NOT include any text outside JSON.
                 and isinstance(q.get("options"), list)
                 and len(q["options"]) >= 2
             ):
-                valid_questions.append(q)
+                questions.append(q)
 
-    return valid_questions
+    return questions
