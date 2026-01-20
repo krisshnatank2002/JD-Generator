@@ -1,6 +1,33 @@
 # jd_clarifier.py
 
 from langchain_core.messages import HumanMessage
+def generate_job_title_clarification(llm, job_title: str):
+    prompt = f"""
+You are an HR expert.
+
+The given job title is:
+"{job_title}"
+
+Generate 5 professional, industry-standard alternative job titles.
+
+Rules:
+- Keep meaning the same
+- Improve professionalism
+- Vary wording slightly
+- Use Title Case
+- Output ONLY a comma-separated list
+"""
+
+    response = llm.invoke(prompt)
+    titles = [t.strip() for t in response.content.split(",") if t.strip()]
+
+    if len(titles) < 3:
+        return None
+
+    return {
+        "question": "Would you like to redefine the job title for better professionalism?",
+        "options": titles[:5]
+    }
 
 def generate_role_specific_clarifying_questions(
     llm,
@@ -49,3 +76,4 @@ DO NOT add any explanations or extra text.
         return questions if isinstance(questions, list) else []
     except Exception:
         return []
+
