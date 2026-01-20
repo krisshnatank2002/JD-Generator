@@ -1,6 +1,11 @@
 # jd_clarifier.py
 
 from langchain_core.messages import HumanMessage
+
+
+# =====================================================
+# JOB TITLE CLARIFICATION (DYNAMIC)
+# =====================================================
 def generate_job_title_clarification(llm, job_title: str):
     prompt = f"""
 You are an HR expert.
@@ -29,22 +34,26 @@ Rules:
         "options": titles[:5]
     }
 
+
+# =====================================================
+# ROLE-SPECIFIC CLARIFYING QUESTIONS
+# =====================================================
 def generate_role_specific_clarifying_questions(
     llm,
     job_title: str,
     jd_text: str
 ):
-questions = []
-
-# 🔹 Job title clarification FIRST
-title_q = generate_job_title_clarification(llm, job_title)
-if title_q:
-    questions.append(title_q)
-
     """
-    Uses LLM to generate role-specific clarifying questions
-    Returns structured questions with MCQ options
+    Uses LLM to generate role-specific clarifying questions.
+    Returns structured questions with MCQ options.
     """
+
+    questions = []
+
+    # 🔹 Job title clarification FIRST
+    title_q = generate_job_title_clarification(llm, job_title)
+    if title_q:
+        questions.append(title_q)
 
     prompt = f"""
 You are a senior HR consultant.
@@ -77,11 +86,11 @@ DO NOT add any explanations or extra text.
     response = llm.invoke([HumanMessage(content=prompt)])
     text = response.content.strip()
 
-    # Safe fallback parsing
     try:
-        questions = eval(text)
-        return questions if isinstance(questions, list) else []
+        parsed = eval(text)
+        if isinstance(parsed, list):
+            questions.extend(parsed)
     except Exception:
-        return []
+        pass
 
-
+    return questions
