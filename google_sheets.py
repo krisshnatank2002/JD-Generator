@@ -80,11 +80,11 @@ def load_form_data():
     client = gspread.authorize(creds)
 
     SPREADSHEET_ID = "1SpNGsY707CaY6i06knI9F2HJdtAcHxGKq8IjAb17oWo"
-
     sheet = client.open_by_key(SPREADSHEET_ID).sheet1
+    
     data = sheet.get_all_records()
-
     return pd.DataFrame(data)
+
 
 
 
