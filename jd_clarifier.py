@@ -58,7 +58,7 @@ Rules:
     if title_options:
         title_options.append("None of the above (keep current title)")
         questions.append({
-            "question": "Is this the most suitable and professional job title for this role?",
+            "question": "Select the most appropriate job title, if you wish to redefine the current title!",
             "options": title_options
         })
 
@@ -141,3 +141,4 @@ FORMAT:
                 questions.append(q)
 
     return questions
+
