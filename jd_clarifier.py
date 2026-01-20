@@ -85,9 +85,6 @@ SOURCE 1: EXCEL / INTAKE DATA
 SOURCE 2: DRAFT JOB DESCRIPTION
 {draft_jd if draft_jd.strip() else "No draft JD provided yet."}
 
-TASK:
-Analyze BOTH sources together.
-
 While reviewing, identify:
 - Information present in Excel but missing in the JD
 - Information stated in the JD but not supported by Excel
@@ -96,15 +93,22 @@ While reviewing, identify:
 
 Ask clarifying questions ONLY for those issues.
 
-JD SECTIONS TO CONSIDER:
-- Core responsibilities
-- Day-to-day activities
-- Scope boundaries (what the role does NOT include)
-- Success metrics / performance expectations
-- Work environment (office / field / hybrid)
-- Travel or shift expectations
-- Tools or systems used
-- Reporting & collaboration
+TASK:
+Analyze the Excel data and the draft JD together.
+
+Identify ONLY those aspects of THIS ROLE that:
+- Are unclear
+- Are missing
+- Are assumed without evidence
+- Could be misunderstood by a candidate
+
+Ask clarifying questions ONLY for those aspects.
+
+IMPORTANT:
+- Different roles must result in different questions
+- Do NOT attempt to cover all JD areas
+- Do NOT ask a question unless this specific role truly needs it
+
 
 STRICT RULES:
 - Do NOT invent responsibilities
@@ -166,5 +170,6 @@ FORMAT:
                 questions.append(q)
 
     return questions
+
 
 
