@@ -121,7 +121,7 @@ STRICT RULES:
 - Ask no more than ONE question per JD section
 
 QUESTION RULES:
-- 6–8 questions maximum
+- 10 -12 questions maximum
 - Multiple-choice only (3–4 realistic options)
 - Neutral wording (no seniority or skill assumptions)
 - Each question must materially change JD accuracy
@@ -170,6 +170,7 @@ FORMAT:
                 questions.append(q)
 
     return questions
+
 
 
 
