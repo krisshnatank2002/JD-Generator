@@ -1,13 +1,20 @@
+from langchain_core.messages import HumanMessage
+import json
+
+
 def generate_role_specific_clarifying_questions(llm, row):
     """
     Generate clarifying questions based on Google Form / Excel data,
     NOT on draft JD.
     """
 
-    job_title = ""
+    # ----------------------------
+    # Resolve Job Title safely
+    # ----------------------------
+    job_title = "This role"
     for k in row.index:
         if "job" in k.lower() and "title" in k.lower():
-            job_title = row[k]
+            job_title = str(row[k]).strip()
             break
 
     core_responsibility = row.get(
@@ -40,30 +47,49 @@ RULES:
 - Questions must be strictly relevant to THIS job title
 - Do NOT assume a technical role unless the title clearly says so
 - Questions should refine:
-  • scope
-  • targets / KPIs
-  • seniority
-  • responsibilities
-  • expectations
+  - scope
+  - targets / KPIs
+  - seniority
+  - responsibilities
+  - expectations
 - Each question must be multiple-choice (3–4 options)
-- Output STRICTLY in this JSON-like format:
+- Output ONLY valid JSON in this exact format:
 
 [
   {{
-    "question": "...",
-    "options": ["...", "...", "..."]
+    "question": "string",
+    "options": ["string", "string", "string"]
   }}
 ]
 
-DO NOT mention software engineering unless role is technical.
 DO NOT include explanations.
+DO NOT include any text outside JSON.
 """
 
     response = llm.invoke([HumanMessage(content=prompt)])
-    text = response.content.strip()
+    raw = response.content.strip()
 
+    # ----------------------------
+    # Safe JSON parsing
+    # ----------------------------
     try:
-        parsed = eval(text)
-        return parsed if isinstance(parsed, list) else []
+        parsed = json.loads(raw)
     except Exception:
         return []
+
+    # ----------------------------
+    # Validate structure
+    # ----------------------------
+    valid_questions = []
+
+    if isinstance(parsed, list):
+        for q in parsed:
+            if (
+                isinstance(q, dict)
+                and isinstance(q.get("question"), str)
+                and isinstance(q.get("options"), list)
+                and len(q["options"]) >= 2
+            ):
+                valid_questions.append(q)
+
+    return valid_questions
