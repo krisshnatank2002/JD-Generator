@@ -1,4 +1,3 @@
-
 import streamlit as st
 import os
 
@@ -38,7 +37,7 @@ st.caption("Generate professional JDs directly from Google Form data")
 st.divider()
 
 # ==========================================
-# 🔑 HELPER: FIND JOB TITLE COLUMN (CRITICAL FIX)
+# 🔑 HELPER: FIND JOB TITLE COLUMN
 # ==========================================
 def find_job_title_column(df):
     for col in df.columns:
@@ -59,7 +58,6 @@ if st.button("📥 Fetch Latest Google Form Responses"):
         st.write("Available columns:", list(df.columns))
         st.stop()
 
-    # ✅ SAFE LABEL
     df["JD_Label"] = df[job_title_col].fillna("Untitled Role")
 
     st.session_state["data"] = df
@@ -71,7 +69,7 @@ if st.button("📥 Fetch Latest Google Form Responses"):
 st.divider()
 
 # ==========================================
-# HELPER: MCQ WITH 4TH OPTION
+# HELPER: RADIO WITH NONE OPTION
 # ==========================================
 def radio_with_none(question, options, key):
     final_options = options + ["None of the above"]
@@ -97,8 +95,6 @@ if "data" in st.session_state:
     if st.button("🚀 Generate Draft JD"):
 
         selected_row = df[df["JD_Label"] == selected_jd].iloc[0].copy()
-
-        # 🔑 CRITICAL FIX — persist job title
         selected_row["__job_title__"] = selected_row[job_title_col]
 
         st.session_state["selected_row"] = selected_row
@@ -134,37 +130,33 @@ if "data" in st.session_state:
     # STEP 3: FINAL JD
     # ================================
     if st.button("✨ Generate FINAL Job Description"):
-            row = st.session_state["selected_row"].copy()
 
-            # Safety net
-            if "__job_title__" not in row:
-                row["__job_title__"] = row[job_title_col]
+        row = st.session_state["selected_row"].copy()
 
-            with st.spinner("Generating FINAL JD..."):
-                final_jd = generate_ranked_jd(
-                    row,
-                    clarifications=st.session_state["answers"]
-                )
+        if "__job_title__" not in row:
+            row["__job_title__"] = row[job_title_col]
 
-                doc = write_jd_to_docx(final_jd, row)
+        with st.spinner("Generating FINAL JD..."):
+            final_jd = generate_ranked_jd(
+                row,
+                clarifications=st.session_state.get("answers", {})
+            )
 
-                os.makedirs("output", exist_ok=True)
-                safe_title = row[job_title_col].replace("/", "_")
-                path = f"output/{safe_title}.docx"
-                doc.save(path)
+            doc = write_jd_to_docx(final_jd, row)
 
-            st.success("🎉 Final JD generated")
+            os.makedirs("output", exist_ok=True)
+            safe_title = row[job_title_col].replace("/", "_")
+            path = f"output/{safe_title}.docx"
+            doc.save(path)
 
-            with open(path, "rb") as f:
-                st.download_button(
-                    "⬇️ Download JD",
-                    f,
-                    file_name=f"{safe_title}.docx"
-                )
+        st.success("🎉 Final JD generated")
+
+        with open(path, "rb") as f:
+            st.download_button(
+                "⬇️ Download JD",
+                f,
+                file_name=f"{safe_title}.docx"
+            )
 
 else:
     st.info("ℹ️ Load Google Form data first")
-
-
-
-
