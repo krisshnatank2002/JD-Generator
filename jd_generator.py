@@ -193,8 +193,6 @@ STRICT OUTPUT RULES (MANDATORY):
 - DO NOT add or remove sections
 - DO NOT write "No company description provided"
 
-You MUST follow the structure below exactly.
-DO NOT print section dividers or instructional text.
 
 =====================
 REQUIRED STRUCTURE
@@ -283,6 +281,7 @@ def write_jd_to_docx(jd_text, row):
 
     add_ctc_and_joining(doc, row)
     return doc
+
 
 
 
