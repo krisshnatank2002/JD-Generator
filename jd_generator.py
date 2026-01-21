@@ -103,19 +103,50 @@ def add_inline_skills(doc, skills):
 # CTC & JOINING BLOCK (MANDATORY)
 # =====================================================
 def add_ctc_and_joining(doc, row):
-    salary = row.get("Salary range (optional)", "").strip()
-    urgency = row.get("How urgent is this hire?", "").strip()
+    """
+    Always prints Compensation & Joining.
+    Tries multiple possible column names safely.
+    """
 
-    if salary or urgency:
-        add_heading(doc, "Compensation & Joining")
+    salary_keys = [
+        "Salary range (optional)",
+        "Salary Range",
+        "Salary",
+        "CTC",
+    ]
 
-        if salary:
-            add_paragraph(doc, f"CTC: {salary}")
+    urgency_keys = [
+        "How urgent is this hire?",
+        "Joining",
+        "Joining timeline",
+        "Hiring urgency",
+    ]
 
-        if urgency:
-            # Map urgency text into readable joining statement
-            joining_text = urgency
-            add_paragraph(doc, f"Joining: {joining_text}")
+    salary = ""
+    urgency = ""
+
+    for k in salary_keys:
+        if k in row and str(row[k]).strip():
+            salary = str(row[k]).strip()
+            break
+
+    for k in urgency_keys:
+        if k in row and str(row[k]).strip():
+            urgency = str(row[k]).strip()
+            break
+
+    # 🔒 ALWAYS SHOW SECTION (even if values missing)
+    add_heading(doc, "Compensation & Joining")
+
+    if salary:
+        add_paragraph(doc, f"CTC: {salary}")
+    else:
+        add_paragraph(doc, "CTC: As per company standards")
+
+    if urgency:
+        add_paragraph(doc, f"Joining: {urgency}")
+    else:
+        add_paragraph(doc, "Joining: As per mutual availability")
 
 # =====================================================
 # HEADER BLOCK
@@ -363,6 +394,7 @@ def write_jd_to_docx(jd_text, row):
         i += 1
     add_ctc_and_joining(doc, row)
     return doc
+
 
 
 
