@@ -197,16 +197,23 @@ HIRING MANAGER CLARIFICATIONS:
     prompt = f"""
 {clarification_block}
 
-STRICT FORMATTING RULES:
- 
+STRICT FORMATTING RULES(NON-NEGOTIABLE):
+GENERAL TONE:
+- Write like a hiring manager, not HR
+- Focus on execution, ownership, and outcomes
+- Avoid generic phrases (e.g. "strong communication", "team player", "dynamic environment")
+- Remove repetition across sections
+- Be confident, direct, and concise
+
 Role Title section:
 - Output ONLY: "Role Title" heading followed by the job title.
 - DO NOT include location, travel, or meta info.
  
-Skills sections:
-- Must-Have Skills and Preferred Skills MUST be bullet points starting with •
-- Each bullet = Skill name + short explanation (1 line)
- 
+Skills Sections:
+- Bullet points ONLY
+- Each skill = keyword or short phrase (no sentences)
+- No repetition between Must-Have and Preferred
+- Keep skills concise and scannable
 If a clarification is not provided, DO NOT infer or assume details for it.
  
 =====================
@@ -223,7 +230,9 @@ Role Overview
 <1 3-4 line clear paragraph explaining the role's purpose and impact.Direct, outcome-focused. No fluff.>
  
 What You'll Do?
-<2–3 line small intro paragraph describing overall responsibilities in short and to the point..>
+<2–3 line small intro paragraph describing overall responsibilities in short and to the pointWhat You'll Do?
+describing the primary execution responsibility. No overlap with Role Overview.>
+
  
 Responsibilities
 • Write 5–6 responsibilities
@@ -235,8 +244,8 @@ Requirements
 • Education, experience, seniority must reflect clarifications
  
 Who'll Succeed in this Role?
-<1 sort paragraph describing mindset, ownership, pace, attitude. Crisp. Action-oriented.Who'll Succeed in this Role? MUST be under 60 words total.
-No motivational language. No culture buzzwords.>
+<50–60 words max. Describe pace, ownership, pressure, and decision-making style.
+No motivational language. No personality adjectives.>
  
 Must-Have Skills
 • Skill – bullet points types short and sharpen and to the point
@@ -339,4 +348,5 @@ def write_jd_to_docx(jd_text, row):
         i += 1
     add_ctc_and_joining(doc, row)
     return doc
+
 
