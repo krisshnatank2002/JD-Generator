@@ -94,6 +94,12 @@ def add_bullet(doc, text):
     p = doc.add_paragraph(style="List Bullet")
     r = p.add_run(text)
     r.font.size = BODY_FONT_SIZE
+    
+def add_bold_label(doc, text):
+    p = doc.add_paragraph()
+    r = p.add_run(text)
+    r.bold = True
+    r.font.size = BODY_FONT_SIZE
 
 # def add_inline_skills(doc, skills):
 #     """
@@ -345,46 +351,48 @@ def write_jd_to_docx(jd_text, row):
     while i < len(lines):
         line = lines[i]
 
-        # Skip Role Title section from LLM
+        # Skip Role Title heading from LLM
         if line == "Role Title":
             i += 2
             continue
 
+        # Real headings
         if line in HEADINGS:
             add_heading(doc, line)
             current_section = line
+
+            if line == "About WOGOM":
+                add_paragraph(doc, ABOUT_WOGOM_TEXT)
+
             i += 1
             continue
 
-        if current_section in {"Must-Have Skills", "Preferred Skills"}:
-            skills = []
-
-            while (
-                i < len(lines)
-                and lines[i] not in HEADINGS
-                and not lines[i].endswith("?")
-            ):
-                skills.append(lines[i].lstrip("•-* ").strip())
-                i += 1
-
-            if skills:
-                add_inline_skills(doc, skills)
-
+        # Subsection labels inside Who’ll Succeed
+        if (
+            current_section in {
+                "Who’ll Succeed in this Role?",
+                "Who'll Succeed in this Role?"
+            }
+            and line.endswith(":")
+        ):
+            add_bold_label(doc, line)
+            i += 1
             continue
 
-        # Handle bullets everywhere except title
+        # Bullet points
         if line.startswith(("•", "-", "*")):
             clean = line.lstrip("•-* ").strip()
             add_bullet(doc, clean)
             i += 1
-        continue
+            continue
 
+    # Normal paragraph
+    add_paragraph(doc, line)
+    i += 1
 
-
-        add_paragraph(doc, line)
-        i += 1
     add_ctc_and_joining(doc, row)
     return doc
+
 
 
 
