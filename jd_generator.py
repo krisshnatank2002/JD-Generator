@@ -225,6 +225,7 @@ HIRING MANAGER CLARIFICATIONS:
 {clarification_block}
 
 STRICT FORMATTING RULES(NON-NEGOTIABLE):
+DO NOT invent company descriptions
 GENERAL TONE:
 - Write like a hiring manager, not HR
 - Focus on execution, ownership, and outcomes
@@ -232,17 +233,6 @@ GENERAL TONE:
 - Remove repetition across sections
 - Be confident, direct, and concise
 
-Role Title section:
-- Output ONLY: "Role Title" heading followed by the job title.
-- DO NOT include location, travel, or meta info.
- 
-Skills Sections:
-- Bullet points ONLY
-- Each skill = keyword or short phrase (no sentences)
-- No repetition between Must-Have and Preferred
-- Keep skills concise and scannable
-If a clarification is not provided, DO NOT infer or assume details for it.
- 
 =====================
 REQUIRED STRUCTURE
 =====================
@@ -251,44 +241,33 @@ Role Title
 <Job Title Only>
 
 About WOGOM
-<Use the provided company description verbatim>
+{ABOUT_WOGOM_TEXT}
 
 Role Overview
-<1 3-4 line clear paragraph explaining the role's purpose and impact.Direct, outcome-focused. No fluff.>
+< 3-4 line clear paragraph explaining the role's purpose and impact.Direct, outcome-focused. No fluff.>
  
 What You'll Do?
-Start with a short paragraph (2–3 lines) summarizing the role’s execution focus.
+Start with a 4–5 line paragraph describing day-to-day execution and ownership
 
-Then list 8–10 key responsibilities.
+Then list 8–10 responsibilities.
 Rules:
-- Use bullet points only
-- Each bullet starts with an action verb
-- little explanations or filler
- 
+- Bullet points only
+- 1–2 lines each
+- Action-oriented, outcome-focused
 
 Who’ll Succeed in this Role?
-List skills and expectations using bullet points only.
-
-Structure:
-- Start directly with bullets (no paragraph)
-- Each bullet follows this format:
-  Skill / Requirement – short 4–6 word description
-
-After listing must-have items, add a line:
-"Preferred Skills"
-
-Under Preferred Skills:
-- Continue bullet points
-- 2–4 items only
-- Same format
-- Do NOT repeat must-have items
-Rules:
-- Keep this section concise and scannable
-- No motivational language
-- No personality adjectives
-- No repetition from “What You’ll Do?”
+Write a short 1-2 line 4-5 bullet points describing the ideal candidate profile.
 
 
+Must-Have Skills
+List 4–6 mandatory skills.
+Format:
+• Skill – one-line explanation
+
+Preferred Skills
+List 2–4 optional skills.
+Format:
+• Skill – one-line explanation
  
 =====================
 INPUT DATA
@@ -314,8 +293,6 @@ Top Skills:
 Other Skills:
 {row.get('other skills','')}
  
-Growth Opportunities:
-{row.get('Growth opportunities in this role','')}
  
 Company Context:
 {row.get('Role Context','')}
@@ -325,25 +302,18 @@ Company Context:
 
 # =====================================================
 # WRITE JD TO DOCX
-# =====================================================
+# ======================================================
 def write_jd_to_docx(jd_text, row):
     doc = Document()
 
-    # -------------------------
     # Job title
-    # -------------------------
     add_job_title(doc, row["__job_title__"])
 
-    # -------------------------
-    # Meta line (location | type | mode)
-    # -------------------------
+    # Meta line
     meta = build_header_block(row)
     if meta:
         add_paragraph(doc, meta)
 
-    # -------------------------
-    # Parse JD text
-    # -------------------------
     lines = [l.strip() for l in jd_text.split("\n") if l.strip()]
     current_section = None
     i = 0
@@ -351,61 +321,40 @@ def write_jd_to_docx(jd_text, row):
     while i < len(lines):
         line = lines[i]
 
-        # Skip Role Title heading coming from LLM
+        # Skip duplicated Role Title
         if line == "Role Title":
             i += 2
             continue
 
-        # -------------------------
-        # Main section headings
-        # -------------------------
+        # Headings
         if line in HEADINGS:
             add_heading(doc, line)
             current_section = line
 
-            # Inject About WOGOM verbatim
             if line == "About WOGOM":
                 add_paragraph(doc, ABOUT_WOGOM_TEXT)
+                i += 1
+                continue
 
             i += 1
             continue
 
-        # -------------------------
-        # Subsection labels inside "Who'll Succeed"
-        # (e.g. Preferred Skills:)
-        # -------------------------
-        if (
-            current_section in {
-                "Who’ll Succeed in this Role?",
-                "Who'll Succeed in this Role?"
-            }
-            and line.endswith(":")
-        ):
-            add_bold_label(doc, line)
-            i += 1
-            continue
-
-        # -------------------------
-        # Bullet points
-        # -------------------------
+        # Bullets
         if line.startswith(("•", "-", "*")):
             clean = line.lstrip("•-* ").strip()
             add_bullet(doc, clean)
             i += 1
             continue
 
-        # -------------------------
-        # Normal paragraph (default)
-        # -------------------------
+        # Normal paragraph
         add_paragraph(doc, line)
         i += 1
 
-    # -------------------------
-    # Compensation & Joining (always last)
-    # -------------------------
+    # Always add compensation last
     add_ctc_and_joining(doc, row)
 
     return doc
+
 
 
 
