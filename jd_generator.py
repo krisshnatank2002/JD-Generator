@@ -12,9 +12,9 @@ import streamlit as st
 # =====================================================
 # FONT SIZES
 # =====================================================
-TITLE_FONT_SIZE = Pt(15)
-HEADING_FONT_SIZE = Pt(13)
-BODY_FONT_SIZE = Pt(11)
+TITLE_FONT_SIZE = Pt(13)
+HEADING_FONT_SIZE = Pt(11)
+BODY_FONT_SIZE = Pt(09)
 
 # =====================================================
 # LOAD GROQ API KEY
@@ -38,7 +38,14 @@ def to_title_case(title: str) -> str:
         return title
     words = title.split()
     return " ".join(w.upper() if w.lower() == "ai" else w.capitalize() for w in words)
-
+# =====================================================
+# CONSTANT COMPANY DESCRIPTION (LOCKED)
+# =====================================================
+ABOUT_WOGOM_TEXT = """WOGOM is a B2B Commerce and Retail Enablement Platform, empowering 6,000+ retailers
+and 450+ sellers across India with better Products, Pricing, Credit, and Growth
+Opportunities.
+Our goal is to build a connected ecosystem where technology, capital, and commerce converge
+to help Indian retailers scale with confidence."""
 # =====================================================
 # JD HEADINGS
 # =====================================================
@@ -88,13 +95,13 @@ def add_bullet(doc, text):
     r = p.add_run(text)
     r.font.size = BODY_FONT_SIZE
 
-def add_inline_skills(doc, skills):
-    """
-    skills: list[str]
-    Converts bullet skills into one compact line
-    """
-    line = ", ".join(skills)
-    add_paragraph(doc, line)
+# def add_inline_skills(doc, skills):
+#     """
+#     skills: list[str]
+#     Converts bullet skills into one compact line
+#     """
+#     line = ", ".join(skills)
+#     add_paragraph(doc, line)
 
 # =====================================================
 # CTC & JOINING BLOCK (MANDATORY)
@@ -378,6 +385,7 @@ def write_jd_to_docx(jd_text, row):
         i += 1
     add_ctc_and_joining(doc, row)
     return doc
+
 
 
 
