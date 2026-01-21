@@ -193,6 +193,9 @@ STRICT OUTPUT RULES (MANDATORY):
 - DO NOT add or remove sections
 - DO NOT write "No company description provided"
 
+You MUST follow the structure below exactly.
+DO NOT print section dividers or instructional text.
+
 =====================
 REQUIRED STRUCTURE
 =====================
@@ -201,7 +204,7 @@ Role Title
 {job_title}
 
 About WOGOM
-{ABOUT_WOGOM_TEXT}
+(Use company description provided by system)
 
 Role Overview
 Write a clear 3–4 line paragraph explaining role purpose, scope, and impact.
@@ -245,7 +248,8 @@ Other Skills: {row.get('other skills','')}
 def write_jd_to_docx(jd_text, row):
     doc = Document()
 
-    add_job_title(doc, row["__job_title__"])
+    add_job_title(doc, to_title_case(row["__job_title__"]))
+
 
     meta = build_header_block(row)
     if meta:
@@ -279,6 +283,7 @@ def write_jd_to_docx(jd_text, row):
 
     add_ctc_and_joining(doc, row)
     return doc
+
 
 
 
