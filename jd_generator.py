@@ -108,27 +108,33 @@ def add_bold_label(doc, text):
 # CTC & JOINING BLOCK (MANDATORY)
 # =====================================================
 def add_ctc_and_joining(doc, row):
-    salary = ""
-    urgency = ""
+    salary = None
+    urgency = None
 
-    if "Salary range (optional)" in row and str(row["Salary range (optional)"]).strip():
-        salary = str(row["Salary range (optional)"]).strip()
+    for col in row.index:
+        col_lower = col.lower()
 
-    if "How urgent is this hire?" in row and str(row["How urgent is this hire?"]).strip():
-        urgency = str(row["How urgent is this hire?"]).strip()
+        if "salary" in col_lower:
+            value = str(row[col]).strip()
+            if value:
+                salary = value
 
-    # ✅ ALWAYS SHOW THIS SECTION
+        if "urgent" in col_lower or "joining" in col_lower:
+            value = str(row[col]).strip()
+            if value:
+                urgency = value
+
     add_heading(doc, "Compensation & Joining")
 
-    if salary:
-        add_paragraph(doc, f"CTC: {salary}")
-    else:
-        add_paragraph(doc, "CTC: As per company standards")
+    add_paragraph(
+        doc,
+        f"CTC: {salary}" if salary else "CTC: As per company standards"
+    )
 
-    if urgency:
-        add_paragraph(doc, f"Joining: {urgency}")
-    else:
-        add_paragraph(doc, "Joining: As per mutual availability")
+    add_paragraph(
+        doc,
+        f"Joining: {urgency}" if urgency else "Joining: As per mutual availability"
+    )
 
 # =====================================================
 # HEADER BLOCK
@@ -181,6 +187,11 @@ def generate_ranked_jd(row, clarifications=None):
     )
 
     job_title = to_title_case(row.get(job_title_col, ""))
+    clarification_text = ""
+    if clarifications:
+        clarification_text = "\n".join(
+            f"- {q}: {a}" for q, a in clarifications.items()
+        )
 
     prompt = f"""
 STRICT OUTPUT RULES (MANDATORY):
@@ -201,6 +212,11 @@ About WOGOM
 
 Role Overview
 Write a clear 3–4 line paragraph explaining role purpose, scope, and impact.
+
+Clarifications
+Use the following confirmed details while writing the JD:
+{clarification_text}
+
 
 What You'll Do?
 Write a strong 2-3 line paragraph describing execution and ownership.
@@ -323,6 +339,7 @@ def write_jd_to_docx(jd_text, row):
 
     add_ctc_and_joining(doc, row)
     return doc
+
 
 
 
