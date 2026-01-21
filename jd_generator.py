@@ -41,11 +41,14 @@ def to_title_case(title: str) -> str:
 # =====================================================
 # CONSTANT COMPANY DESCRIPTION (LOCKED)
 # =====================================================
-ABOUT_WOGOM_TEXT = """WOGOM is a B2B Commerce and Retail Enablement Platform, empowering 6,000+ retailers
-and 450+ sellers across India with better Products, Pricing, Credit, and Growth
-Opportunities.
-Our goal is to build a connected ecosystem where technology, capital, and commerce converge
-to help Indian retailers scale with confidence."""
+ABOUT_WOGOM_TEXT = (
+    "WOGOM is a B2B Commerce and Retail Enablement Platform, empowering 6,000+ retailers "
+    "and 450+ sellers across India with better Products, Pricing, Credit, and Growth Opportunities. "
+    
+    "Our goal is to build a connected ecosystem where technology, capital, and commerce converge "
+    "to help Indian retailers scale with confidence."
+)
+
 # =====================================================
 # JD HEADINGS
 # =====================================================
@@ -283,17 +286,28 @@ def write_jd_to_docx(jd_text, row):
 
     lines = clean_llm_output(jd_text)
     current_section = None
+    
+    job_title_value = to_title_case(row["__job_title__"])
 
     for line in lines:
 
-        # Skip duplicate role title
+        # Skip role title label
         if line == "Role Title":
             continue
+
+            # Skip role title value (Service Executive)
+            if line == job_title_value:
+                continue
+
 
         # Headings
         if line in HEADINGS:
             add_heading(doc, line)
             current_section = line
+
+            if line == "About WOGOM":
+                add_paragraph(doc, ABOUT_WOGOM_TEXT)
+                current_section = None  # ignore LLM content for this section
             continue
 
 
@@ -307,6 +321,7 @@ def write_jd_to_docx(jd_text, row):
 
     add_ctc_and_joining(doc, row)
     return doc
+
 
 
 
