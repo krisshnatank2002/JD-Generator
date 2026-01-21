@@ -193,6 +193,9 @@ STRICT OUTPUT RULES (MANDATORY):
 - DO NOT add or remove sections
 - DO NOT write "No company description provided"
 
+=====================
+REQUIRED STRUCTURE
+=====================
 
 Role Title
 {job_title}
@@ -276,6 +279,7 @@ def write_jd_to_docx(jd_text, row):
 
     add_ctc_and_joining(doc, row)
     return doc
+
 
 
 
