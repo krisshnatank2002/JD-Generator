@@ -103,39 +103,16 @@ def add_inline_skills(doc, skills):
 # CTC & JOINING BLOCK (MANDATORY)
 # =====================================================
 def add_ctc_and_joining(doc, row):
-    """
-    Always prints Compensation & Joining.
-    Tries multiple possible column names safely.
-    """
-
-    salary_keys = [
-        "Salary range (optional)",
-        "Salary Range",
-        "Salary",
-        "CTC",
-    ]
-
-    urgency_keys = [
-        "How urgent is this hire?",
-        "Joining",
-        "Joining timeline",
-        "Hiring urgency",
-    ]
-
     salary = ""
     urgency = ""
 
-    for k in salary_keys:
-        if k in row and str(row[k]).strip():
-            salary = str(row[k]).strip()
-            break
+    if "Salary range (optional)" in row and str(row["Salary range (optional)"]).strip():
+        salary = str(row["Salary range (optional)"]).strip()
 
-    for k in urgency_keys:
-        if k in row and str(row[k]).strip():
-            urgency = str(row[k]).strip()
-            break
+    if "How urgent is this hire?" in row and str(row["How urgent is this hire?"]).strip():
+        urgency = str(row["How urgent is this hire?"]).strip()
 
-    # 🔒 ALWAYS SHOW SECTION (even if values missing)
+    # ✅ ALWAYS SHOW THIS SECTION
     add_heading(doc, "Compensation & Joining")
 
     if salary:
@@ -294,19 +271,19 @@ Who'll Succeed in this Role?
 No motivational language. No personality adjectives.>
  
 Must-Have Skills
-• Skill – bullet points types short and sharpen and to the point
-• Skill – bullet points types short and sharpen and to the point
-• Skill – bullet points types short and sharpen and to the point
-• Skill – bullet points types short and sharpen and to the point
-• Skill – bullet points types short and sharpen and to the point
- 
+List 4–5 core skills required to perform this role.
+Rules:
+- Output ONE skill per line (no bullets)
+- Each skill = Skill name + short 2–4 word qualifier in brackets
+- No sentences
+- No repetition
+
 Preferred Skills
-• Skill – bullet points types short and sharpen and to the point
-• Skill – bullet points types short and sharpen and to the point
-• Skill – bullet points types short and sharpen and to the point
-• Skill –bullet points types short and sharpen and to the point
-• Skill – bullet points types short and sharpen and to the point
- 
+List 3–5 additional skills that are helpful but not required.
+Rules:
+- Output ONE skill per line (no bullets)
+- Each skill = Skill name + short 2–4 word qualifier in brackets
+- Do NOT repeat Must-Have skills
 
  
 =====================
@@ -383,17 +360,27 @@ def write_jd_to_docx(jd_text, row):
 
         if current_section in {"Must-Have Skills", "Preferred Skills"}:
             skills = []
-            while i < len(lines) and lines[i].startswith(("•", "-", "*")):
+
+            while (
+                i < len(lines)
+                and lines[i] not in HEADINGS
+                and not lines[i].endswith("?")
+            ):
                 skills.append(lines[i].lstrip("•-* ").strip())
                 i += 1
-            add_inline_skills(doc, skills)
+
+            if skills:
+                add_inline_skills(doc, skills)
+
             continue
+
 
 
         add_paragraph(doc, line)
         i += 1
     add_ctc_and_joining(doc, row)
     return doc
+
 
 
 
