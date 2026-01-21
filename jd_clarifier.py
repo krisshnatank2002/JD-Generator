@@ -38,14 +38,16 @@ def generate_role_specific_clarifying_questions(llm, row, draft_jd: str = ""):
     # 1️⃣ FIXED QUESTION — JOB TITLE REFINEMENT
     # =====================================================
     title_prompt = f"""
-You are an HR expert.
+You are a senior hiring manager expert.
 
 Current job title:
 "{job_title}"
 
-Generate 5–6 professional alternative job titles
-suitable for hiring and job postings.
-
+Your task:
+Propose 5–6 alternative job titles that would:
+- Better reflect actual ownership and execution
+- Be suitable for job portals (LinkedIn, Naukri)
+- Reduce ambiguity for candidates
 Rules:
 - Keep the same role meaning
 - Improve clarity and professionalism
@@ -85,6 +87,9 @@ SOURCE 1: EXCEL / INTAKE DATA
 SOURCE 2: DRAFT JOB DESCRIPTION
 {draft_jd if draft_jd.strip() else "No draft JD provided yet."}
 
+Your goal:
+Ask ONLY clarifying questions that would
+MATERIALLY IMPROVE the final JD.
 While reviewing, identify:
 - Information present in Excel but missing in the JD
 - Information stated in the JD but not supported by Excel
@@ -120,6 +125,14 @@ STRICT RULES:
 - Cover at least 5 different JD sections
 - Ask no more than ONE question per JD section
 
+STRICT RULES:
+- Ask 3–4 questions ONLY
+- One question per JD section maximum
+- Multiple-choice only (3–4 realistic options)
+- Neutral, factual wording
+- No assumptions
+- No repetition
+- Questions must be role-specific
 QUESTION RULES:
 - 5-6 questions maximum
 - Multiple-choice only (3–4 realistic options)
@@ -170,6 +183,7 @@ FORMAT:
                 questions.append(q)
 
     return questions
+
 
 
 
