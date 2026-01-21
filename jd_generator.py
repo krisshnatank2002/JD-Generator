@@ -90,6 +90,15 @@ def add_bullet(doc, text):
     p = doc.add_paragraph(style="List Bullet")
     r = p.add_run(text)
     r.font.size = BODY_FONT_SIZE
+
+def add_inline_skills(doc, skills):
+    """
+    skills: list[str]
+    Converts bullet skills into one compact line
+    """
+    line = ", ".join(skills)
+    add_paragraph(doc, line)
+
 # =====================================================
 # CTC & JOINING BLOCK (MANDATORY)
 # =====================================================
@@ -224,7 +233,7 @@ Role Title
 <Job Title Only>
 
 About WOGOM
-<2–3 lines about company mission and culture>
+<3-4 lines paragraph about company mission and culture>
 
 Role Overview
 <1 3-4 line clear paragraph explaining the role's purpose and impact.Direct, outcome-focused. No fluff.>
@@ -235,13 +244,19 @@ describing the primary execution responsibility. No overlap with Role Overview.>
 
  
 Responsibilities
-• Write 5–6 responsibilities
-• Each responsibility 1–2 lines
-• Reflect clarifications explicitly
- 
+• Responsibilities
+•  Write 5 execution-focused lines
+• Each line must start with an action verb
+•  No filler words
+• No explanations
+•  Each line must fit on one line
+
 Requirements
-• 4–5 requirements
+• Write 4–5 crisp expectation statements
 • Education, experience, seniority must reflect clarifications
+- No repetition of responsibilities
+- Phrase like "What we’re looking for"
+
  
 Who'll Succeed in this Role?
 <50–60 words max. Describe pace, ownership, pressure, and decision-making style.
@@ -335,18 +350,19 @@ def write_jd_to_docx(jd_text, row):
             i += 1
             continue
 
-        if line.startswith(("•", "-", "*")):
-            clean = line.lstrip("•-* ").strip()
-            if current_section in BULLET_SECTIONS:
-                add_bullet(doc, clean)
-            else:
-                add_paragraph(doc, clean)
-            i += 1
+        if current_section in {"Must-Have Skills", "Preferred Skills"}:
+            skills = []
+            while i < len(lines) and lines[i].startswith(("•", "-", "*")):
+                skills.append(lines[i].lstrip("•-* ").strip())
+                i += 1
+            add_inline_skills(doc, skills)
             continue
+
 
         add_paragraph(doc, line)
         i += 1
     add_ctc_and_joining(doc, row)
     return doc
+
 
 
