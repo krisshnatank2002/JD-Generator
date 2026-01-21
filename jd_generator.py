@@ -277,8 +277,8 @@ def clean_llm_output(jd_text: str) -> list[str]:
 def write_jd_to_docx(jd_text, row):
     doc = Document()
 
+    # Job title (ONLY ONCE)
     add_job_title(doc, to_title_case(row["__job_title__"]))
-
 
     meta = build_header_block(row)
     if meta:
@@ -286,7 +286,6 @@ def write_jd_to_docx(jd_text, row):
 
     lines = clean_llm_output(jd_text)
     current_section = None
-    
     job_title_value = to_title_case(row["__job_title__"])
 
     for line in lines:
@@ -295,21 +294,24 @@ def write_jd_to_docx(jd_text, row):
         if line == "Role Title":
             continue
 
-            # Skip role title value (Service Executive)
+        # Skip duplicated job title value
         if line == job_title_value:
             continue
-
 
         # Headings
         if line in HEADINGS:
             add_heading(doc, line)
             current_section = line
 
+            # Lock About WOGOM
             if line == "About WOGOM":
                 add_paragraph(doc, ABOUT_WOGOM_TEXT)
-                current_section = None  # ignore LLM content for this section
+                current_section = None
             continue
 
+        # Ignore LLM content for locked sections
+        if current_section is None:
+            continue
 
         # Bullet points
         if line.startswith("•"):
@@ -321,6 +323,8 @@ def write_jd_to_docx(jd_text, row):
 
     add_ctc_and_joining(doc, row)
     return doc
+
+
 
 
 
