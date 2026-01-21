@@ -197,15 +197,18 @@ def generate_ranked_jd(row, clarifications=None):
 
     prompt = f"""
 STRICT OUTPUT RULES (MANDATORY):
-- Use EXACT section headings
-- DO NOT add or remove sections
-- DO NOT create a separate Clarifications section
-- Clarifications MUST be absorbed into relevant sections
-- If a clarification affects responsibilities, include it in "What You'll Do?"
-- If a clarification affects skills, include it in "Must-Have Skills" or "Preferred Skills"
-- If a clarification affects seniority, ownership, or profile, include it in "Who’ll Succeed in this Role?"
-- NEVER mention the word "clarification" in the output
-- Education and experience must be reflected naturally in "Who’ll Succeed in this Role?"
+- Write in the SAME language quality, tone, and sentence style as a modern
+  operator-led startup JD (execution-focused, crisp, non-generic)
+- Use short, confident sentences
+- Avoid buzzwords, fluff, and corporate clichés
+- Sound like the role owner wrote this JD, not HR
+
+STRUCTURE RULES:
+- Use EXACT section headings provided
+- Do NOT add or remove sections
+- Do NOT create a separate Clarifications section
+- Clarifications MUST be absorbed naturally
+- NEVER mention the word "clarification"
 
 =====================
 REQUIRED STRUCTURE
@@ -218,21 +221,26 @@ About WOGOM
 {ABOUT_WOGOM_TEXT}
 
 Role Overview
-Write a clear 2-3 max line paragraph explaining role purpose, scope, and impact.
-
+Write a clear 2–3 line paragraph.
+Explain:
+1) Why this role exists
+2) How value is created
+3) Where the impact is felt
+NO bullets. NO skills. NO responsibilities here.
 
 
 What You'll Do?
-Write a strong 2-3 line max paragraph describing execution and ownership.
+First write a short 2–3 max line paragraph describing execution ownership and scope.
 
-Then list 4-5 max responsibilities:
-• Each bullet 1–2 lines
-• Action oriented
-• No generic filler
+Then list 4–5 responsibilities:
+• Each bullet must describe a tangible output or action
+• Each bullet max 1–2 lines
+• Action-oriented, specific, non-generic
 
 Who’ll Succeed in this Role?
-Write a short 2–3 line max paragraph describing the ideal candidate profile.
-
+Write a 2–3 line max paragraph describing mindset, working style, and ownership.
+Do NOT list skills here.
+Education and experience must be reflected naturally, not as a list.
 Must-Have Skills
 • Skill – one-line explanation
 • Skill – one-line explanation
@@ -352,6 +360,7 @@ def write_jd_to_docx(jd_text, row):
 
     add_ctc_and_joining(doc, row)
     return doc
+
 
 
 
