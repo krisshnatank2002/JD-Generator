@@ -44,6 +44,7 @@ def to_title_case(title: str) -> str:
 # =====================================================
 HEADINGS = {
     "Reporting To",
+    "About WOGOM",
     "Role Overview",
     "What You’ll Do?",
     "What You'll Do?",
@@ -54,7 +55,6 @@ HEADINGS = {
     "Must-Have Skills",
     "Preferred Skills",
     "Growth Opportunities",
-    "About WOGOM",
     "Hiring Priority",
 }
 
@@ -90,6 +90,23 @@ def add_bullet(doc, text):
     p = doc.add_paragraph(style="List Bullet")
     r = p.add_run(text)
     r.font.size = BODY_FONT_SIZE
+# =====================================================
+# CTC & JOINING BLOCK (MANDATORY)
+# =====================================================
+def add_ctc_and_joining(doc, row):
+    salary = row.get("Salary range (optional)", "").strip()
+    urgency = row.get("How urgent is this hire?", "").strip()
+
+    if salary or urgency:
+        add_heading(doc, "Compensation & Joining")
+
+        if salary:
+            add_paragraph(doc, f"CTC: {salary}")
+
+        if urgency:
+            # Map urgency text into readable joining statement
+            joining_text = urgency
+            add_paragraph(doc, f"Joining: {joining_text}")
 
 # =====================================================
 # HEADER BLOCK
@@ -188,7 +205,7 @@ Role Title section:
  
 Skills sections:
 - Must-Have Skills and Preferred Skills MUST be bullet points starting with •
-- Each bullet = Skill name + VERY brief explanation (1 line)
+- Each bullet = Skill name + short explanation (1 line)
  
 If a clarification is not provided, DO NOT infer or assume details for it.
  
@@ -198,12 +215,15 @@ REQUIRED STRUCTURE
  
 Role Title
 <Job Title Only>
- 
+
+About WOGOM
+<2–3 lines about company mission and culture>
+
 Role Overview
-<1 clear paragraph explaining the role's purpose and impact.>
+<1 3-4 line clear paragraph explaining the role's purpose and impact.Direct, outcome-focused. No fluff.>
  
 What You'll Do?
-<2–3 line intro paragraph describing overall responsibilities.>
+<2–3 line small intro paragraph describing overall responsibilities in short and to the point..>
  
 Responsibilities
 • Write 5–6 responsibilities
@@ -215,24 +235,24 @@ Requirements
 • Education, experience, seniority must reflect clarifications
  
 Who'll Succeed in this Role?
-<1 paragraph describing mindset, ownership, pace, attitude>
+<1 sort paragraph describing mindset, ownership, pace, attitude. Crisp. Action-oriented.Who'll Succeed in this Role? MUST be under 60 words total.
+No motivational language. No culture buzzwords.>
  
 Must-Have Skills
-• Skill – brief explanation
-• Skill – brief explanation
-• Skill – brief explanation
-• Skill – brief explanation
-• Skill – brief explanation
+• Skill – bullet points types short and sharpen and to the point
+• Skill – bullet points types short and sharpen and to the point
+• Skill – bullet points types short and sharpen and to the point
+• Skill – bullet points types short and sharpen and to the point
+• Skill – bullet points types short and sharpen and to the point
  
 Preferred Skills
-• Skill – brief explanation
-• Skill – brief explanation
-• Skill – brief explanation
-• Skill – brief explanation
-• Skill – brief explanation
+• Skill – bullet points types short and sharpen and to the point
+• Skill – bullet points types short and sharpen and to the point
+• Skill – bullet points types short and sharpen and to the point
+• Skill –bullet points types short and sharpen and to the point
+• Skill – bullet points types short and sharpen and to the point
  
-About WOGOM
-<2–3 lines about company mission and culture>
+
  
 =====================
 INPUT DATA
@@ -317,5 +337,6 @@ def write_jd_to_docx(jd_text, row):
 
         add_paragraph(doc, line)
         i += 1
-
+    add_ctc_and_joining(doc, row)
     return doc
+
