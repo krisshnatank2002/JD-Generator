@@ -8,28 +8,47 @@ from langchain_groq import ChatGroq
 # ==========================================
 # 🎨 CUSTOM UI THEME (MINIMAL & STYLISH)
 # ==========================================
+# ==========================================
+# 🎨 PASTEL UI THEME (SOFT & MODERN)
+# ==========================================
 st.markdown(
     """
     <style>
-    /* ===== App background ===== */
+    /* ===== App Background (Pastel Gradient) ===== */
     .stApp {
-        background: linear-gradient(135deg, #f8fafc, #eef2f7);
+        background: linear-gradient(
+            135deg,
+            #e0f2fe,
+            #ecfdf5,
+            #fef9c3,
+            #fce7f3
+        );
+        background-size: 300% 300%;
+        animation: gradientBG 18s ease infinite;
         font-family: "Inter", sans-serif;
     }
 
-    /* ===== Main container ===== */
+    @keyframes gradientBG {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+
+    /* ===== Main Card ===== */
     section.main > div {
         max-width: 900px;
-        padding: 2rem 2.5rem;
-        background: white;
-        border-radius: 16px;
-        box-shadow: 0 12px 30px rgba(0,0,0,0.06);
+        padding: 2.2rem 2.5rem;
+        background: rgba(255, 255, 255, 0.92);
+        border-radius: 18px;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.08);
+        backdrop-filter: blur(8px);
     }
 
     /* ===== Headings ===== */
     h1 {
-        font-weight: 700;
         color: #0f172a;
+        font-weight: 700;
+        letter-spacing: -0.5px;
     }
 
     h2, h3 {
@@ -37,57 +56,66 @@ st.markdown(
         font-weight: 600;
     }
 
-    /* ===== Caption text ===== */
+    /* ===== Caption ===== */
     .stCaption {
-        color: #64748b;
+        color: #475569;
         font-size: 0.95rem;
     }
 
     /* ===== Buttons ===== */
     .stButton > button {
-        background: linear-gradient(135deg, #6366f1, #4f46e5);
-        color: white;
-        border-radius: 10px;
-        padding: 0.55rem 1.2rem;
+        background: linear-gradient(135deg, #bbf7d0, #bae6fd);
+        color: #0f172a;
+        border-radius: 12px;
+        padding: 0.6rem 1.3rem;
         border: none;
         font-weight: 600;
-        transition: all 0.2s ease-in-out;
+        transition: all 0.25s ease;
     }
 
     .stButton > button:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 6px 16px rgba(79,70,229,0.35);
+        background: linear-gradient(135deg, #fde68a, #fbcfe8);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 18px rgba(0,0,0,0.15);
     }
 
     /* ===== Selectbox & Radio ===== */
     .stSelectbox, .stRadio {
         background: #f8fafc;
-        border-radius: 10px;
-        padding: 0.4rem;
+        border-radius: 12px;
+        padding: 0.45rem;
+    }
+
+    /* ===== Radio options spacing ===== */
+    .stRadio > div {
+        gap: 0.6rem;
     }
 
     /* ===== Divider ===== */
     hr {
         border: none;
         height: 1px;
-        background: linear-gradient(to right, transparent, #e5e7eb, transparent);
-        margin: 1.5rem 0;
+        background: linear-gradient(to right, transparent, #cbd5f5, transparent);
+        margin: 1.6rem 0;
     }
 
-    /* ===== Success / Info messages ===== */
+    /* ===== Alerts ===== */
     .stAlert {
-        border-radius: 12px;
+        border-radius: 14px;
+        background: #ecfdf5;
+        color: #065f46;
     }
 
     /* ===== Dataframe ===== */
     .stDataFrame {
-        border-radius: 12px;
+        border-radius: 14px;
         overflow: hidden;
     }
     </style>
     """,
     unsafe_allow_html=True
 )
+
 
 # ==========================================
 # PAGE CONFIG
@@ -246,4 +274,5 @@ if "data" in st.session_state:
 
 else:
     st.info("ℹ️ Load Google Form data first")
+
 
