@@ -14,7 +14,7 @@ import streamlit as st
 # =====================================================
 TITLE_FONT_SIZE = Pt(13)
 HEADING_FONT_SIZE = Pt(11)
-BODY_FONT_SIZE = Pt(09)
+BODY_FONT_SIZE = Pt(9)
 
 # =====================================================
 # LOAD GROQ API KEY
@@ -406,6 +406,7 @@ def write_jd_to_docx(jd_text, row):
     add_ctc_and_joining(doc, row)
 
     return doc
+
 
 
 
