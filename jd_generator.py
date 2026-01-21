@@ -54,7 +54,6 @@ HEADINGS = {
     "Who'll Succeed in this Role?",
     "Must-Have Skills",
     "Preferred Skills",
-    "Growth Opportunities",
     "Hiring Priority",
 }
 
@@ -265,25 +264,32 @@ Requirements
 - No repetition of responsibilities
 - Phrase like "What we’re looking for"
 
- 
-Who'll Succeed in this Role?
-<50–60 words max. Describe pace, ownership, pressure, and decision-making style.
-No motivational language. No personality adjectives.>
- 
-Must-Have Skills
-List 4–5 core skills required to perform this role.
-Rules:
-- Output ONE skill per line (no bullets)
-- Each skill = Skill name + short 2–4 word qualifier in brackets
-- No sentences
-- No repetition
+Who’ll Succeed in this Role?
+Start with a brief description (2–3 lines) of the ideal candidate profile.
 
-Preferred Skills
-List 3–5 additional skills that are helpful but not required.
+Then include TWO clearly labeled subsections:
+Structure:
+- Start directly with bullets (no paragraph)
+- Each bullet must follow this format:
+  Skill name – short 5-6 word description
+
+Must-Have Skills:
+- List 4–5 non-negotiable skills or capabilities
+- One skill per line
+
+
+Under Preferred Skills:
+- Use bullet points only
+- 2–4 skills maximum
+- Same format: Skill – short description
+- Do NOT repeat must-have skills
+
 Rules:
-- Output ONE skill per line (no bullets)
-- Each skill = Skill name + short 2–4 word qualifier in brackets
-- Do NOT repeat Must-Have skills
+- Keep this section concise and scannable
+- No motivational language
+- No personality adjectives
+- No repetition from “What You’ll Do?”
+
 
  
 =====================
@@ -380,6 +386,7 @@ def write_jd_to_docx(jd_text, row):
         i += 1
     add_ctc_and_joining(doc, row)
     return doc
+
 
 
 
