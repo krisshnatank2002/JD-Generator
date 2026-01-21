@@ -218,14 +218,14 @@ About WOGOM
 {ABOUT_WOGOM_TEXT}
 
 Role Overview
-Write a clear 2-3 line paragraph explaining role purpose, scope, and impact.
+Write a clear 2-3 max line paragraph explaining role purpose, scope, and impact.
 
 
 
 What You'll Do?
-Write a strong 2-3 line paragraph describing execution and ownership.
+Write a strong 2-3 line max paragraph describing execution and ownership.
 
-Then list 4-5 responsibilities:
+Then list 4-5 max responsibilities:
 • Each bullet 1–2 lines
 • Action oriented
 • No generic filler
@@ -352,6 +352,7 @@ def write_jd_to_docx(jd_text, row):
 
     add_ctc_and_joining(doc, row)
     return doc
+
 
 
 
