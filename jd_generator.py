@@ -329,21 +329,21 @@ Company Context:
 def write_jd_to_docx(jd_text, row):
     doc = Document()
 
-    BULLET_SECTIONS = {
-        "Responsibilities",
-        "Requirements",
-        "Must-Have Skills",
-        "Preferred Skills",
-    }
+    # -------------------------
     # Job title
+    # -------------------------
     add_job_title(doc, row["__job_title__"])
 
-    # Meta line
+    # -------------------------
+    # Meta line (location | type | mode)
+    # -------------------------
     meta = build_header_block(row)
     if meta:
         add_paragraph(doc, meta)
 
-    # Parse JD
+    # -------------------------
+    # Parse JD text
+    # -------------------------
     lines = [l.strip() for l in jd_text.split("\n") if l.strip()]
     current_section = None
     i = 0
@@ -351,23 +351,29 @@ def write_jd_to_docx(jd_text, row):
     while i < len(lines):
         line = lines[i]
 
-        # Skip Role Title heading from LLM
+        # Skip Role Title heading coming from LLM
         if line == "Role Title":
             i += 2
             continue
 
-        # Real headings
+        # -------------------------
+        # Main section headings
+        # -------------------------
         if line in HEADINGS:
             add_heading(doc, line)
             current_section = line
 
+            # Inject About WOGOM verbatim
             if line == "About WOGOM":
                 add_paragraph(doc, ABOUT_WOGOM_TEXT)
 
             i += 1
             continue
 
-        # Subsection labels inside Who’ll Succeed
+        # -------------------------
+        # Subsection labels inside "Who'll Succeed"
+        # (e.g. Preferred Skills:)
+        # -------------------------
         if (
             current_section in {
                 "Who’ll Succeed in this Role?",
@@ -379,19 +385,28 @@ def write_jd_to_docx(jd_text, row):
             i += 1
             continue
 
+        # -------------------------
         # Bullet points
+        # -------------------------
         if line.startswith(("•", "-", "*")):
             clean = line.lstrip("•-* ").strip()
             add_bullet(doc, clean)
             i += 1
             continue
 
-    # Normal paragraph
-    add_paragraph(doc, line)
-    i += 1
+        # -------------------------
+        # Normal paragraph (default)
+        # -------------------------
+        add_paragraph(doc, line)
+        i += 1
 
+    # -------------------------
+    # Compensation & Joining (always last)
+    # -------------------------
     add_ctc_and_joining(doc, row)
+
     return doc
+
 
 
 
