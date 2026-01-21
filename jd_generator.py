@@ -101,14 +101,6 @@ def add_bold_label(doc, text):
     r.bold = True
     r.font.size = BODY_FONT_SIZE
 
-# def add_inline_skills(doc, skills):
-#     """
-#     skills: list[str]
-#     Converts bullet skills into one compact line
-#     """
-#     line = ", ".join(skills)
-#     add_paragraph(doc, line)
-
 # =====================================================
 # CTC & JOINING BLOCK (MANDATORY)
 # =====================================================
@@ -202,7 +194,7 @@ Role Title
 {job_title}
 
 About WOGOM
-(Use company description provided by system)
+{ABOUT_WOGOM_TEXT}
 
 Role Overview
 Write a clear 3–4 line paragraph explaining role purpose, scope, and impact.
@@ -281,6 +273,7 @@ def write_jd_to_docx(jd_text, row):
 
     add_ctc_and_joining(doc, row)
     return doc
+
 
 
 
