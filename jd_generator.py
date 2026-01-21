@@ -258,10 +258,8 @@ def write_jd_to_docx(jd_text, row):
         if line in HEADINGS:
             add_heading(doc, line)
             current_section = line
-
-            if line == "About WOGOM":
-                add_paragraph(doc, ABOUT_WOGOM_TEXT)
             continue
+
 
         # Bullet points
         if line.startswith("•"):
@@ -273,6 +271,7 @@ def write_jd_to_docx(jd_text, row):
 
     add_ctc_and_joining(doc, row)
     return doc
+
 
 
 
