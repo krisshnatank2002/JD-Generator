@@ -12,9 +12,9 @@ import streamlit as st
 # =====================================================
 # FONT SIZES
 # =====================================================
-TITLE_FONT_SIZE = Pt(13)
-HEADING_FONT_SIZE = Pt(11)
-BODY_FONT_SIZE = Pt(9)
+TITLE_FONT_SIZE = Pt(14)
+HEADING_FONT_SIZE = Pt(12)
+BODY_FONT_SIZE = Pt(10)
 
 # =====================================================
 # LOAD GROQ API KEY
@@ -231,6 +231,42 @@ Other Skills: {row.get('other skills','')}
 
     response = llm.invoke([HumanMessage(content=prompt)])
     return response.content.strip()
+    
+def clean_llm_output(jd_text: str) -> list[str]:
+    """
+    Removes prompt scaffolding like:
+    =====================
+    REQUIRED STRUCTURE
+    INPUT DATA
+    etc.
+    Returns clean JD lines only.
+    """
+    banned_phrases = {
+        "required structure",
+        "input data",
+        "strict output rules"
+    }
+
+    cleaned_lines = []
+
+    for line in jd_text.split("\n"):
+        stripped = line.strip()
+
+        # Skip empty lines
+        if not stripped:
+            continue
+
+        # Skip separators like ========
+        if set(stripped) == {"="}:
+            continue
+
+        # Skip instructional headings
+        if stripped.lower() in banned_phrases:
+            continue
+
+        cleaned_lines.append(stripped)
+
+    return cleaned_lines
 
 # =====================================================
 # WRITE JD TO DOCX
@@ -245,7 +281,7 @@ def write_jd_to_docx(jd_text, row):
     if meta:
         add_paragraph(doc, meta)
 
-    lines = [l.strip() for l in jd_text.split("\n") if l.strip()]
+    lines = clean_llm_output(jd_text)
     current_section = None
 
     for line in lines:
@@ -271,6 +307,7 @@ def write_jd_to_docx(jd_text, row):
 
     add_ctc_and_joining(doc, row)
     return doc
+
 
 
 
