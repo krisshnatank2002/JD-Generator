@@ -218,7 +218,7 @@ About WOGOM
 {ABOUT_WOGOM_TEXT}
 
 Role Overview
-Write a clear 3–4 line paragraph explaining role purpose, scope, and impact.
+Write a clear 2-3 line paragraph explaining role purpose, scope, and impact.
 
 
 
@@ -352,6 +352,7 @@ def write_jd_to_docx(jd_text, row):
 
     add_ctc_and_joining(doc, row)
     return doc
+
 
 
 
