@@ -296,8 +296,8 @@ def write_jd_to_docx(jd_text, row):
             continue
 
             # Skip role title value (Service Executive)
-            if line == job_title_value:
-                continue
+        if line == job_title_value:
+            continue
 
 
         # Headings
@@ -321,6 +321,7 @@ def write_jd_to_docx(jd_text, row):
 
     add_ctc_and_joining(doc, row)
     return doc
+
 
 
 
