@@ -109,20 +109,22 @@ def add_bold_label(doc, text):
 # =====================================================
 def add_ctc_and_joining(doc, row):
     salary = None
-    urgency = None
+    joining = None
 
     for col in row.index:
         col_lower = col.lower()
+        value = str(row[col]).strip()
 
-        if "salary" in col_lower:
-            value = str(row[col]).strip()
-            if value:
-                salary = value
+        if not value:
+            continue
 
-        if "urgent" in col_lower or "joining" in col_lower:
-            value = str(row[col]).strip()
-            if value:
-                urgency = value
+        # Salary column
+        if "salary range" in col_lower:
+            salary = value
+
+        # Urgency / joining column
+        if "urgent" in col_lower or "hire" in col_lower:
+            joining = value
 
     add_heading(doc, "Compensation & Joining")
 
@@ -133,7 +135,7 @@ def add_ctc_and_joining(doc, row):
 
     add_paragraph(
         doc,
-        f"Joining: {urgency}" if urgency else "Joining: As per mutual availability"
+        f"Joining: {joining}" if joining else "Joining: As per mutual availability"
     )
 
 # =====================================================
@@ -203,6 +205,7 @@ STRICT OUTPUT RULES (MANDATORY):
 - If a clarification affects skills, include it in "Must-Have Skills" or "Preferred Skills"
 - If a clarification affects seniority, ownership, or profile, include it in "Who’ll Succeed in this Role?"
 - NEVER mention the word "clarification" in the output
+- Education and experience must be reflected naturally in "Who’ll Succeed in this Role?"
 
 =====================
 REQUIRED STRUCTURE
@@ -253,6 +256,8 @@ Job Title: {row.get('Job Title','')}
 Core Responsibility: {row.get('What is the single core responsibility of this role?','')}
 Key Responsibilities: {row.get('Key Responsibilities','')}
 Top Skills: {row.get('Top 3 skills this role MUST have','')}
+Minimum Education: {row.get('Minimum education required','')}
+Minimum Experience: {row.get('Minimum experience required','')}
 Other Skills: {row.get('other skills','')}
 """
 
@@ -347,6 +352,7 @@ def write_jd_to_docx(jd_text, row):
 
     add_ctc_and_joining(doc, row)
     return doc
+
 
 
 
