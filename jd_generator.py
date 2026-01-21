@@ -176,127 +176,66 @@ def sanitize_clarifications(clarifications):
 # CORE JD GENERATION
 # =====================================================
 def generate_ranked_jd(row, clarifications=None):
-    """
-    Clarifications are MANDATORY if provided.
-    They OVERRIDE assumptions and must influence:
-    - Responsibilities
-    - Requirements
-    - Skills
-    - Seniority
- 
-    If clarification == 'Not Applicable', it is ignored.
-    """
 
     clarifications = clarifications or {}
     clarifications = sanitize_clarifications(clarifications)
 
-    # 🔹 Detect Job Title column dynamically
-    job_title_col = None
-    for k in row.index:
-        if "job" in k.lower() and "title" in k.lower():
-            job_title_col = k
-            break
+    job_title_col = next(
+        (k for k in row.index if "job" in k.lower() and "title" in k.lower()),
+        None
+    )
 
-    job_title = row.get(job_title_col, "")
-
-    # 🔹 Override if clarified
-    for q, a in clarifications.items():
-        if "job title" in q.lower():
-            job_title = a
-            break
-
-    job_title = to_title_case(job_title)
-
-    clarification_block = ""
-    if clarifications:
-        clarification_block = """
-IMPORTANT – MANDATORY OVERRIDE RULES:
- 
-You MUST strictly incorporate ALL clarifications below.
-These clarifications OVERRIDE assumptions from input data.
-They MUST directly affect responsibilities, scope, skills, and expectations.
- 
-HIRING MANAGER CLARIFICATIONS:
-"""
-        for q, a in clarifications.items():
-            clarification_block += f"- {q}: {a}\n"
+    job_title = to_title_case(row.get(job_title_col, ""))
 
     prompt = f"""
-{clarification_block}
-
-STRICT FORMATTING RULES(NON-NEGOTIABLE):
-DO NOT invent company descriptions
-GENERAL TONE:
-- Write like a hiring manager, not HR
-- Focus on execution, ownership, and outcomes
-- Avoid generic phrases (e.g. "strong communication", "team player", "dynamic environment")
-- Remove repetition across sections
-- Be confident, direct, and concise
+STRICT OUTPUT RULES (MANDATORY):
+- Use EXACT section headings
+- DO NOT add or remove sections
+- DO NOT write "No company description provided"
 
 =====================
 REQUIRED STRUCTURE
 =====================
- 
+
 Role Title
-<Job Title Only>
+{job_title}
 
 About WOGOM
 {ABOUT_WOGOM_TEXT}
 
 Role Overview
-< 3-4 line clear paragraph explaining the role's purpose and impact.Direct, outcome-focused. No fluff.>
- 
-What You'll Do?
-Start with a 4–5 line paragraph describing day-to-day execution and ownership
+Write a clear 3–4 line paragraph explaining role purpose, scope, and impact.
 
-Then list 8–10 responsibilities.
-Rules:
-- Bullet points only
-- 1–2 lines each
-- Action-oriented, outcome-focused
+What You'll Do?
+Write a strong 4–5 line paragraph describing execution and ownership.
+
+Then list 8–10 responsibilities:
+• Each bullet 1–2 lines
+• Action oriented
+• No generic filler
 
 Who’ll Succeed in this Role?
-Write a short 1-2 line 4-5 bullet points describing the ideal candidate profile.
-
+Write a short 2–3 line paragraph describing the ideal candidate profile.
 
 Must-Have Skills
-List 4–6 mandatory skills.
-Format:
+• Skill – one-line explanation
 • Skill – one-line explanation
 
 Preferred Skills
-List 2–4 optional skills.
-Format:
 • Skill – one-line explanation
- 
+• Skill – one-line explanation
+
 =====================
 INPUT DATA
 =====================
- 
+
 Job Title: {row.get('Job Title','')}
- 
-Reporting To: {row.get('Reporting To','')}
- 
-Role Overview:
-{row.get('Role Overview','')}
- 
-Education: {row.get('Minimum education required','')}
-Experience: {row.get('Minimum experience required','')}
 Core Responsibility: {row.get('What is the single core responsibility of this role?','')}
- 
-Key Responsibilities:
-{row.get('Key Responsibilities','')}
- 
-Top Skills:
-{row.get('Top 3 skills this role MUST have','')}
- 
-Other Skills:
-{row.get('other skills','')}
- 
- 
-Company Context:
-{row.get('Role Context','')}
+Key Responsibilities: {row.get('Key Responsibilities','')}
+Top Skills: {row.get('Top 3 skills this role MUST have','')}
+Other Skills: {row.get('other skills','')}
 """
+
     response = llm.invoke([HumanMessage(content=prompt)])
     return response.content.strip()
 
@@ -306,24 +245,19 @@ Company Context:
 def write_jd_to_docx(jd_text, row):
     doc = Document()
 
-    # Job title
     add_job_title(doc, row["__job_title__"])
 
-    # Meta line
     meta = build_header_block(row)
     if meta:
         add_paragraph(doc, meta)
 
     lines = [l.strip() for l in jd_text.split("\n") if l.strip()]
     current_section = None
-    i = 0
 
-    while i < len(lines):
-        line = lines[i]
+    for line in lines:
 
-        # Skip duplicated Role Title
+        # Skip duplicate role title
         if line == "Role Title":
-            i += 2
             continue
 
         # Headings
@@ -333,27 +267,20 @@ def write_jd_to_docx(jd_text, row):
 
             if line == "About WOGOM":
                 add_paragraph(doc, ABOUT_WOGOM_TEXT)
-                i += 1
-                continue
-
-            i += 1
             continue
 
-        # Bullets
-        if line.startswith(("•", "-", "*")):
-            clean = line.lstrip("•-* ").strip()
-            add_bullet(doc, clean)
-            i += 1
+        # Bullet points
+        if line.startswith("•"):
+            add_bullet(doc, line.lstrip("• ").strip())
             continue
 
         # Normal paragraph
         add_paragraph(doc, line)
-        i += 1
 
-    # Always add compensation last
     add_ctc_and_joining(doc, row)
-
     return doc
+
+
 
 
 
