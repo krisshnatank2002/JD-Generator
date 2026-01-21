@@ -5,6 +5,89 @@ from google_sheets import load_form_data
 from jd_generator import generate_ranked_jd, write_jd_to_docx
 from jd_clarifier import generate_role_specific_clarifying_questions
 from langchain_groq import ChatGroq
+# ==========================================
+# 🎨 CUSTOM UI THEME (MINIMAL & STYLISH)
+# ==========================================
+st.markdown(
+    """
+    <style>
+    /* ===== App background ===== */
+    .stApp {
+        background: linear-gradient(135deg, #f8fafc, #eef2f7);
+        font-family: "Inter", sans-serif;
+    }
+
+    /* ===== Main container ===== */
+    section.main > div {
+        max-width: 900px;
+        padding: 2rem 2.5rem;
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 12px 30px rgba(0,0,0,0.06);
+    }
+
+    /* ===== Headings ===== */
+    h1 {
+        font-weight: 700;
+        color: #0f172a;
+    }
+
+    h2, h3 {
+        color: #1e293b;
+        font-weight: 600;
+    }
+
+    /* ===== Caption text ===== */
+    .stCaption {
+        color: #64748b;
+        font-size: 0.95rem;
+    }
+
+    /* ===== Buttons ===== */
+    .stButton > button {
+        background: linear-gradient(135deg, #6366f1, #4f46e5);
+        color: white;
+        border-radius: 10px;
+        padding: 0.55rem 1.2rem;
+        border: none;
+        font-weight: 600;
+        transition: all 0.2s ease-in-out;
+    }
+
+    .stButton > button:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 6px 16px rgba(79,70,229,0.35);
+    }
+
+    /* ===== Selectbox & Radio ===== */
+    .stSelectbox, .stRadio {
+        background: #f8fafc;
+        border-radius: 10px;
+        padding: 0.4rem;
+    }
+
+    /* ===== Divider ===== */
+    hr {
+        border: none;
+        height: 1px;
+        background: linear-gradient(to right, transparent, #e5e7eb, transparent);
+        margin: 1.5rem 0;
+    }
+
+    /* ===== Success / Info messages ===== */
+    .stAlert {
+        border-radius: 12px;
+    }
+
+    /* ===== Dataframe ===== */
+    .stDataFrame {
+        border-radius: 12px;
+        overflow: hidden;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
 
 # ==========================================
 # PAGE CONFIG
@@ -163,3 +246,4 @@ if "data" in st.session_state:
 
 else:
     st.info("ℹ️ Load Google Form data first")
+
