@@ -48,8 +48,6 @@ HEADINGS = {
     "Role Overview",
     "What You’ll Do?",
     "What You'll Do?",
-    "Responsibilities",
-    "Requirements",
     "Who’ll Succeed in this Role?",
     "Who'll Succeed in this Role?",
     "Must-Have Skills",
@@ -240,50 +238,37 @@ Role Title
 <Job Title Only>
 
 About WOGOM
-<3-4 lines paragraph about company mission and culture>
+<Use the provided company description verbatim>
 
 Role Overview
 <1 3-4 line clear paragraph explaining the role's purpose and impact.Direct, outcome-focused. No fluff.>
  
 What You'll Do?
-<2–3 line small intro paragraph describing overall responsibilities in short and to the pointWhat You'll Do?
-describing the primary execution responsibility. No overlap with Role Overview.>
+Start with a short paragraph (2–3 lines) summarizing the role’s execution focus.
 
+Then list 8–10 key responsibilities.
+Rules:
+- Use bullet points only
+- Each bullet starts with an action verb
+- little explanations or filler
  
-Responsibilities
-• Responsibilities
-•  Write 5 execution-focused lines
-• Each line must start with an action verb
-•  No filler words
-• No explanations
-•  Each line must fit on one line
-
-Requirements
-• Write 4–5 crisp expectation statements
-• Education, experience, seniority must reflect clarifications
-- No repetition of responsibilities
-- Phrase like "What we’re looking for"
 
 Who’ll Succeed in this Role?
-Start with a brief description (2–3 lines) of the ideal candidate profile.
+List skills and expectations using bullet points only.
 
-Then include TWO clearly labeled subsections:
 Structure:
 - Start directly with bullets (no paragraph)
-- Each bullet must follow this format:
-  Skill name – short 5-6 word description
+- Each bullet follows this format:
+  Skill / Requirement – short 4–6 word description
 
-Must-Have Skills:
-- List 4–5 non-negotiable skills or capabilities
-- One skill per line
-
+After listing must-have items, add a line:
+"Preferred Skills"
 
 Under Preferred Skills:
-- Use bullet points only
-- 2–4 skills maximum
-- Same format: Skill – short description
-- Do NOT repeat must-have skills
-
+- Continue bullet points
+- 2–4 items only
+- Same format
+- Do NOT repeat must-have items
 Rules:
 - Keep this section concise and scannable
 - No motivational language
@@ -380,12 +365,20 @@ def write_jd_to_docx(jd_text, row):
 
             continue
 
+        # Handle bullets everywhere except title
+        if line.startswith(("•", "-", "*")):
+            clean = line.lstrip("•-* ").strip()
+            add_bullet(doc, clean)
+            i += 1
+        continue
+
 
 
         add_paragraph(doc, line)
         i += 1
     add_ctc_and_joining(doc, row)
     return doc
+
 
 
 
