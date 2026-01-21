@@ -193,9 +193,6 @@ STRICT OUTPUT RULES (MANDATORY):
 - DO NOT add or remove sections
 - DO NOT write "No company description provided"
 
-=====================
-REQUIRED STRUCTURE
-=====================
 
 Role Title
 {job_title}
@@ -207,9 +204,9 @@ Role Overview
 Write a clear 3–4 line paragraph explaining role purpose, scope, and impact.
 
 What You'll Do?
-Write a strong 4–5 line paragraph describing execution and ownership.
+Write a strong 2-3 line paragraph describing execution and ownership.
 
-Then list 8–10 responsibilities:
+Then list 4-5 responsibilities:
 • Each bullet 1–2 lines
 • Action oriented
 • No generic filler
@@ -279,6 +276,7 @@ def write_jd_to_docx(jd_text, row):
 
     add_ctc_and_joining(doc, row)
     return doc
+
 
 
 
