@@ -231,7 +231,7 @@ Then list 4-5 max responsibilities:
 • No generic filler
 
 Who’ll Succeed in this Role?
-Write a short 2–3 line paragraph describing the ideal candidate profile.
+Write a short 2–3 line max paragraph describing the ideal candidate profile.
 
 Must-Have Skills
 • Skill – one-line explanation
@@ -352,6 +352,7 @@ def write_jd_to_docx(jd_text, row):
 
     add_ctc_and_joining(doc, row)
     return doc
+
 
 
 
