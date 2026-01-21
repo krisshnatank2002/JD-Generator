@@ -197,8 +197,12 @@ def generate_ranked_jd(row, clarifications=None):
 STRICT OUTPUT RULES (MANDATORY):
 - Use EXACT section headings
 - DO NOT add or remove sections
-- DO NOT write "No company description provided"
-
+- DO NOT create a separate Clarifications section
+- Clarifications MUST be absorbed into relevant sections
+- If a clarification affects responsibilities, include it in "What You'll Do?"
+- If a clarification affects skills, include it in "Must-Have Skills" or "Preferred Skills"
+- If a clarification affects seniority, ownership, or profile, include it in "Who’ll Succeed in this Role?"
+- NEVER mention the word "clarification" in the output
 
 =====================
 REQUIRED STRUCTURE
@@ -213,9 +217,6 @@ About WOGOM
 Role Overview
 Write a clear 3–4 line paragraph explaining role purpose, scope, and impact.
 
-Clarifications
-Use the following confirmed details while writing the JD:
-{clarification_text}
 
 
 What You'll Do?
@@ -236,6 +237,13 @@ Must-Have Skills
 Preferred Skills
 • Skill – one-line explanation
 • Skill – one-line explanation
+=====================
+CONTEXT TO INCORPORATE (DO NOT DISPLAY)
+=====================
+The following answers are CONFIRMED and must be naturally reflected
+inside the most relevant sections above:
+
+{clarification_text}
 
 =====================
 INPUT DATA
@@ -339,6 +347,7 @@ def write_jd_to_docx(jd_text, row):
 
     add_ctc_and_joining(doc, row)
     return doc
+
 
 
 
